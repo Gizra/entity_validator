@@ -18,11 +18,18 @@ function node_validator_menu() {
 function node_validator_demo() {
   $node = new NodeValidate();
   $node
-    ->setLabel('A')
+    ->setLabel('')
     ->setBundle('roy')
 //    ->addField('field_date','')
-    ->addField('field_date','20')
+    ->addField('field_date', array('20'))
     ->validate();
+
+//  $node = new stdClass();
+//  $node->type = 'roy';
+//  $node->language = 'en';
+//  $wrapper = entity_metadata_wrapper('node', $node);
+//  $wrapper->field_date->set(array('20'));
+//  $wrapper->save();
   return 'a';
 }
 

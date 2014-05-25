@@ -1,5 +1,6 @@
 name = Node validator
 core = 7.x
 dependencies[] = node
+dependencies[] = entity
 
 files[] = includes/NodeValidate.php
