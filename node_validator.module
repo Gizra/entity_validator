@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Implement hook_menu().
+ */
+function node_validator_menu() {
+  $items = array();
+
+  $items['node_validate/demo'] = array(
+    'title' => 'Demo',
+    'access callback' => TRUE,
+    'page callback' => 'node_validator_demo',
+  );
+
+  return $items;
+}
+
+function node_validator_demo() {
+  $node = new NodeValidate();
+  $node
+    ->setLabel('A')
+    ->setBundle('roy')
+//    ->addField('field_date','')
+    ->addField('field_date','20')
+    ->validate();
+  return 'a';
+}
+
+function node_validator_field_info_alter(&$info) {
+  $info['datetime']['node_validator_callback'] = array(
+    'node_validator_date_validate',
+  );
+}
+
+function node_validator_date_validate($value) {
+  return strtotime($value);
+}

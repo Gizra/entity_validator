@@ -1,0 +1,5 @@
+name = Node validator
+core = 7.x
+dependencies[] = node
+
+files[] = includes/NodeValidate.php
