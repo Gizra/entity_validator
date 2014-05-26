@@ -3,7 +3,15 @@
 /**
  * @file
  * node_validator.module
- *
- * This should probably left empty since there no need for any integration with
- * drupal. The only use in this module is the NodeValidator class.
  */
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function restful_ctools_plugin_type() {
+  $plugins['node_validator'] = array(
+    'classes' => array('class'),
+  );
+
+  return $plugins;
+}
