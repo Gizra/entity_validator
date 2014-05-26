@@ -31,10 +31,25 @@ abstract class AbstractValidate implements Validate {
   protected $bundle;
 
   /**
-   * The error level. 1 for simple drupal_set_message, 2 for throwing exception.
+   * The error level.
+   *  0 For save the errors for later.
+   *  1 for simple drupal_set_message.
+   *  2 for throwing exception.
    * @var int
    */
   protected $errorLevel = 1;
+
+  /**
+   * Store the errors in case the error set to 0.
+   *
+   * @var Array
+   */
+  protected $errors;
+
+  /**
+   * @var Array
+   */
+  protected $metaData;
 
   /**
    * {@inheritdoc}
@@ -75,10 +90,6 @@ abstract class AbstractValidate implements Validate {
    * {@inheritdoc}
    */
   public function validate() {
-    if (empty($this->label)) {
-      $this->setError(t('The title is missing'));
-    }
-
     foreach ($this->fields as $field => $value) {
       // Loading some default value of the fields and the instance.
       $field_info = field_info_field($field);
@@ -114,6 +125,9 @@ abstract class AbstractValidate implements Validate {
    * {@inheritdoc}
    */
   public function setError($message) {
+    if ($this->errorLevel === 0) {
+      $this->errors[] = $message;
+    }
     if ($this->errorLevel === 1) {
       drupal_set_message($message, 'error');
     }
@@ -121,4 +135,15 @@ abstract class AbstractValidate implements Validate {
       throw new Exception($message);
     }
   }
+
+  /**
+   *
+   */
+    public function getErrors() {
+      return $this->errors;
+    }
+
+    public function addMetaData($key, $value) {
+
+    }
 }
