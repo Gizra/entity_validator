@@ -63,6 +63,13 @@ abstract class AbstractValidate implements Validate {
   /**
    * {@inheritdoc}
    */
+  public function getBundle() {
+    return $this->bundle;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setEntity($entity) {
     $this->entityType = $entity;
     return $this;
@@ -73,7 +80,6 @@ abstract class AbstractValidate implements Validate {
    */
   public function addField($name, $value) {
     $this->fields[$name] = $value;
-
     return $this;
   }
 

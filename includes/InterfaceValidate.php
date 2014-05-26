@@ -13,6 +13,11 @@ interface Validate {
   public function setBundle($bundle);
 
   /**
+   * Retrieve the bundle.
+   */
+  public function getBundle();
+
+  /**
    * Set the entity type.
    *
    * @param $entity
@@ -84,6 +89,9 @@ interface Validate {
 
   /**
    * Register pre validation function in order to manipulate the object.
+   * Register function for the pre-validate process used when i want to validate
+   * the current validator instance and not validate each field using
+   * node_validator_callback.
    *
    * @param $function
    *  The name of the functions run before validating fields.
