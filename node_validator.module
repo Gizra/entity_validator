@@ -1,51 +1,9 @@
 <?php
 
 /**
- * Implement hook_menu().
+ * @file
+ * node_validator.module
+ *
+ * This should probably left empty since there no need for any integration with
+ * drupal. The only use in this module is the NodeValidator class.
  */
-function node_validator_menu() {
-  $items = array();
-
-  $items['node_validate/demo'] = array(
-    'title' => 'Demo',
-    'access callback' => TRUE,
-    'page callback' => 'node_validator_demo',
-  );
-
-  return $items;
-}
-
-/**
- * Page callback;
- */
-function node_validator_demo() {
-  $node = new NodeValidate();
-  $node
-    ->setErrorLevel(0)
-    ->setLabel('')
-    ->setBundle('roy')
-//    ->addField('field_date','')
-    ->addField('field_date', array('20'))
-    ->validate();
-
-  if ($node->getErrors()) {
-    drupal_set_message(t('Errors! the node is not valid'), 'error');
-  }
-  return '';
-}
-
-/**
- * Implements hook_field_info_alter().
- */
-function node_validator_field_info_alter(&$info) {
-  $info['datetime']['node_validator_callback'] = array(
-    'node_validator_date_validate',
-  );
-}
-
-/**
- * Validator callback;
- */
-function node_validator_date_validate(NodeValidate $validator, $value) {
-  return strtotime($value);
-}
