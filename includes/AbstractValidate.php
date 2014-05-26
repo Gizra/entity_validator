@@ -103,7 +103,7 @@ abstract class AbstractValidate implements Validate {
       }
       else {
         // Use the entity API validation.
-        if (!entity_property_verify_data_type($value, $field_type_info['property_type'])) {
+        if (isset($field_type_info['property_type']) && !entity_property_verify_data_type($value, $field_type_info['property_type'])) {
           $params = array(
             '%value' => (String) $value,
             '%field-label' => $instance_info['label'],
@@ -114,9 +114,11 @@ abstract class AbstractValidate implements Validate {
         }
 
         // Node validator validations passed.
-        foreach ($field_type_info['node_validator_callback'] as $callback) {
-          if (!call_user_func_array($callback, array($this, $value))) {
-            $this->setError(t('The given format is not valid: %format', array('%format' => $value)));
+        if (isset($field_type_info['node_validator_callback'])) {
+          foreach ($field_type_info['node_validator_callback'] as $callback) {
+            if (!call_user_func_array($callback, array($this, $value))) {
+              $this->setError(t('The given format is not valid: %format', array('%format' => $value)));
+            }
           }
         }
       }
@@ -130,7 +132,7 @@ abstract class AbstractValidate implements Validate {
     if ($this->errorLevel === 0) {
       $this->errors[] = $message;
     }
-    if ($this->errorLevel === 1) {
+    else if ($this->errorLevel === 1) {
       drupal_set_message($message, 'error');
     }
     else {
