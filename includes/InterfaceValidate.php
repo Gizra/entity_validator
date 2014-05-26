@@ -45,6 +45,64 @@ interface Validate {
   public function addField($name, $value);
 
   /**
+   * Retrieve fields.
+   *
+   * @return Array
+   */
+  public function getFields();
+
+  /**
+   * Set the fields.
+   *
+   * @param $fields
+   *  The desire structure.
+   *
+   * @return $this.
+   */
+  public function setFields($fields);
+
+  /**
+   * Set the error level.
+   */
+  public function setErrorLevel($level);
+
+  /**
+   * Retrieve the errors.
+   *
+   * @return Array
+   */
+  public function getErrors();
+
+  /**
+   * Add metadata about the object.
+   *
+   * @param $key
+   *  The key.
+   * @param $value
+   *  The value.
+   * @return $this
+   */
+  public function addMetaData($key, $value);
+
+  /**
+   * Retrieve all the metadata.
+   *
+   * @return Array
+   *  All the metadata the user added to the object.
+   */
+  public function getMetaData();
+
+  /**
+   * Register pre validation function in order to manipulate the object.
+   *
+   * @param $function
+   *  The name of the functions run before validating fields.
+   *
+   * @return $this
+   */
+  public function preValidateRegister($function);
+
+  /**
    * Initialize the validate process.
    */
   public function validate();

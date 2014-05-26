@@ -54,6 +54,11 @@ abstract class AbstractValidate implements Validate {
   protected $metaData;
 
   /**
+   * @var array
+   */
+  protected $preValidate = array();
+
+  /**
    * {@inheritdoc}
    */
   public function setLabel($label = NULL) {
@@ -91,7 +96,30 @@ abstract class AbstractValidate implements Validate {
   /**
    * {@inheritdoc}
    */
+  public function getFields() {
+    return $this->fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFields($fields) {
+    $this->fields = $fields;
+    return $this->fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function validate() {
+    foreach ($this->preValidate as $prevalidate) {
+      if (!function_exists($prevalidate)) {
+        continue;
+      }
+
+      call_user_func_array($prevalidate, array($this));
+    }
+
     foreach ($this->fields as $field => $value) {
       // Loading some default value of the fields and the instance.
       $field_info = field_info_field($field);
@@ -141,7 +169,7 @@ abstract class AbstractValidate implements Validate {
   }
 
   /**
-   * Set the error level.
+   * {@inheritdoc}
    */
   public function setErrorLevel($level) {
     $this->errorLevel = $level;
@@ -149,22 +177,14 @@ abstract class AbstractValidate implements Validate {
   }
 
   /**
-   * Retrieve the errors.
-   *
-   * @return Array
+   * {@inheritdoc}
    */
   public function getErrors() {
     return $this->errors;
   }
 
   /**
-   * Add metadata about the object.
-   *
-   * @param $key
-   *  The key.
-   * @param $value
-   *  The value.
-   * @return $this
+   * {@inheritdoc}
    */
   public function addMetaData($key, $value) {
     $this->metaData[$key] = $value;
@@ -172,12 +192,17 @@ abstract class AbstractValidate implements Validate {
   }
 
   /**
-   * Retrieve all the metadata.
-   *
-   * @return Array
-   *  All the metadata the user added to the object.
+   * {@inheritdoc}
    */
   public function getMetaData() {
     return $this->metaData;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preValidateRegister($function) {
+    $this->preValidate[] = $function;
+    return $this;
   }
 }
