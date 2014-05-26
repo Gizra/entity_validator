@@ -47,6 +47,8 @@ abstract class AbstractValidate implements Validate {
   protected $errors;
 
   /**
+   * Holds metadata about the object.
+   *
    * @var Array
    */
   protected $metaData;
@@ -113,7 +115,7 @@ abstract class AbstractValidate implements Validate {
 
         // Node validator validations passed.
         foreach ($field_type_info['node_validator_callback'] as $callback) {
-          if (!call_user_func_array($callback, array($value))) {
+          if (!call_user_func_array($callback, array($this, $value))) {
             $this->setError(t('The given format is not valid: %format', array('%format' => $value)));
           }
         }
@@ -137,13 +139,43 @@ abstract class AbstractValidate implements Validate {
   }
 
   /**
-   *
+   * Set the error level.
    */
-    public function getErrors() {
-      return $this->errors;
-    }
+  public function setErrorLevel($level) {
+    $this->errorLevel = $level;
+    return $this;
+  }
 
-    public function addMetaData($key, $value) {
+  /**
+   * Retrieve the errors.
+   *
+   * @return Array
+   */
+  public function getErrors() {
+    return $this->errors;
+  }
 
-    }
+  /**
+   * Add metadata about the object.
+   *
+   * @param $key
+   *  The key.
+   * @param $value
+   *  The value.
+   * @return $this
+   */
+  public function addMetaData($key, $value) {
+    $this->metaData[$key] = $value;
+    return $this;
+  }
+
+  /**
+   * Retrieve all the metadata.
+   *
+   * @return Array
+   *  All the metadata the user added to the object.
+   */
+  public function getMetaData() {
+    return $this->metaData;
+  }
 }
