@@ -18,18 +18,16 @@ function node_validator_menu() {
 function node_validator_demo() {
   $node = new NodeValidate();
   $node
+    ->setErrorLevel(0)
     ->setLabel('')
     ->setBundle('roy')
 //    ->addField('field_date','')
     ->addField('field_date', array('20'))
     ->validate();
 
-//  $node = new stdClass();
-//  $node->type = 'roy';
-//  $node->language = 'en';
-//  $wrapper = entity_metadata_wrapper('node', $node);
-//  $wrapper->field_date->set(array('20'));
-//  $wrapper->save();
+  if ($node->getErrors()) {
+    drupal_set_message(t('Errors! the node is not valid'), 'error');
+  }
   return 'a';
 }
 
@@ -39,6 +37,6 @@ function node_validator_field_info_alter(&$info) {
   );
 }
 
-function node_validator_date_validate($value) {
+function node_validator_date_validate(NodeValidate $validator, $value) {
   return strtotime($value);
 }
