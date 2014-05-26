@@ -28,6 +28,8 @@ function node_validator_example_menu() {
  * Page callback;
  */
 function node_validator_example_example() {
-  node_validator_load_validator('node', 'article');
+  node_validator_load_validator('node', 'article')
+    ->addField('title', 'foo')
+    ->validate();
   return '';
 }

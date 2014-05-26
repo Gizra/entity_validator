@@ -43,7 +43,9 @@ function node_validator_load_validator($entity_type, $bundle) {
   foreach ($plugins as $plugin) {
     if ($entity_type == $plugin['entity_type'] && $bundle == $plugin['bundle']) {
       require_once $plugin['path'] . '/' . $plugin['class'] . '.php';
-      return new $plugin['class'];
+      $validator = new $plugin['class'];
+
+      return $validator->setBundle($bundle);
     }
   }
 }

@@ -21,14 +21,14 @@ abstract class AbstractValidate implements Validate {
    *
    * @var Array.
    */
-  protected $fields;
+  protected $fields = array();
 
   /**
    * Store the errors in case the error set to 0.
    *
    * @var Array
    */
-  protected $errors;
+  protected $errors = array();
 
   /**
    * {@inheritdoc}
@@ -74,7 +74,7 @@ abstract class AbstractValidate implements Validate {
    */
   public function setFields($fields) {
     $this->fields = $fields;
-    return $this->fields;
+    return $this;
   }
 
   /**
@@ -115,10 +115,12 @@ abstract class AbstractValidate implements Validate {
 
     if (!empty($this->errors)) {
       $params = array(
-        '!errors' => theme('item_list', array('!errors' => $this->errors)),
+        '@errors' => implode(", ", $this->errors),
       );
-      throw new Exception(t('The validation process failed: !errors', $params));
+      throw new Exception(t('The validation process failed: @errors', $params));
     }
+
+    return TRUE;
   }
 
   /**
