@@ -25,7 +25,7 @@ interface Validate {
    *
    * @return $this
    */
-  public function setEntity($entity);
+  public function setEntityType($entity);
 
   /**
    * Adding the field the validation process.
@@ -55,50 +55,6 @@ interface Validate {
    * @return $this.
    */
   public function setFields($fields);
-
-  /**
-   * Set the error level.
-   */
-  public function setErrorLevel($level);
-
-  /**
-   * Retrieve the errors.
-   *
-   * @return Array
-   */
-  public function getErrors();
-
-  /**
-   * Add metadata about the object.
-   *
-   * @param $key
-   *  The key.
-   * @param $value
-   *  The value.
-   * @return $this
-   */
-  public function addMetaData($key, $value);
-
-  /**
-   * Retrieve all the metadata.
-   *
-   * @return Array
-   *  All the metadata the user added to the object.
-   */
-  public function getMetaData();
-
-  /**
-   * Register pre validation function in order to manipulate the object.
-   * Register function for the pre-validate process used when i want to validate
-   * the current validator instance and not validate each field using
-   * node_validator_callback.
-   *
-   * @param $function
-   *  The name of the functions run before validating fields.
-   *
-   * @return $this
-   */
-  public function preValidateRegister($function);
 
   /**
    * Initialize the validate process.

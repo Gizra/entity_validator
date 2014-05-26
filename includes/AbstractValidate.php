@@ -3,13 +3,6 @@
 abstract class AbstractValidate implements Validate {
 
   /**
-   * List of fields keyed by machine name and valued with the field's value.
-   *
-   * @var Array.
-   */
-  protected $fields;
-
-  /**
    * The entity type.
    *
    * @var string
@@ -24,13 +17,11 @@ abstract class AbstractValidate implements Validate {
   protected $bundle;
 
   /**
-   * The error level.
-   *  0 For save the errors for later.
-   *  1 for simple drupal_set_message.
-   *  2 for throwing exception.
-   * @var int
+   * List of fields keyed by machine name and valued with the field's value.
+   *
+   * @var Array.
    */
-  protected $errorLevel = 1;
+  protected $fields;
 
   /**
    * Store the errors in case the error set to 0.
@@ -38,18 +29,6 @@ abstract class AbstractValidate implements Validate {
    * @var Array
    */
   protected $errors;
-
-  /**
-   * Holds metadata about the object.
-   *
-   * @var Array
-   */
-  protected $metaData;
-
-  /**
-   * @var array
-   */
-  protected $preValidate = array();
 
   /**
    * {@inheritdoc}
@@ -70,8 +49,8 @@ abstract class AbstractValidate implements Validate {
   /**
    * {@inheritdoc}
    */
-  public function setEntity($entity) {
-    $this->entityType = $entity;
+  public function setEntityType($entity_type) {
+    $this->entityType = $entity_type;
     return $this;
   }
 
@@ -102,14 +81,6 @@ abstract class AbstractValidate implements Validate {
    * {@inheritdoc}
    */
   public function validate() {
-    foreach ($this->preValidate as $prevalidate) {
-      if (!function_exists($prevalidate)) {
-        continue;
-      }
-
-      call_user_func_array($prevalidate, array($this));
-    }
-
     foreach ($this->fields as $field => $value) {
       // Loading some default value of the fields and the instance.
       $field_info = field_info_field($field);
@@ -141,58 +112,19 @@ abstract class AbstractValidate implements Validate {
         }
       }
     }
+
+    if (!empty($this->errors)) {
+      $params = array(
+        '!errors' => theme('item_list', array('!errors' => $this->errors)),
+      );
+      throw new Exception(t('The validation process failed: !errors', $params));
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function setError($message) {
-    if ($this->errorLevel === 0) {
-      $this->errors[] = $message;
-    }
-    else if ($this->errorLevel === 1) {
-      drupal_set_message($message, 'error');
-    }
-    else {
-      throw new Exception($message);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setErrorLevel($level) {
-    $this->errorLevel = $level;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getErrors() {
-    return $this->errors;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addMetaData($key, $value) {
-    $this->metaData[$key] = $value;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMetaData() {
-    return $this->metaData;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preValidateRegister($function) {
-    $this->preValidate[] = $function;
-    return $this;
+    $this->errors[] = $message;
   }
 }
