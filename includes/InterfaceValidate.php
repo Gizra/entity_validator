@@ -3,16 +3,6 @@
 interface Validate {
 
   /**
-   * Setting the label of the node.
-   *
-   * @param null $label
-   *  The label of the node.
-   *
-   * @return $this
-   */
-  public function setLabel($label = NULL);
-
-  /**
    * Set the bundle of the node.
    *
    * @param $bundle

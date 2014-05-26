@@ -30,8 +30,8 @@ function my_module_validator_demo() {
   $node = new NodeValidate();
   $node
     ->setErrorLevel(0)
-    ->setLabel('')
     ->setBundle('article')
+    ->addField('title', '')
     ->addField('field_date', array('20'))
     ->validate();
 

@@ -3,13 +3,6 @@
 abstract class AbstractValidate implements Validate {
 
   /**
-   * The label of the node.
-   *
-   * @var String.
-   */
-  protected $label;
-
-  /**
    * List of fields keyed by machine name and valued with the field's value.
    *
    * @var Array.
@@ -57,15 +50,6 @@ abstract class AbstractValidate implements Validate {
    * @var array
    */
   protected $preValidate = array();
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setLabel($label = NULL) {
-    $this->label = $label;
-
-    return $this;
-  }
 
   /**
    * {@inheritdoc}
