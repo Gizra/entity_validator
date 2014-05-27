@@ -35,7 +35,7 @@ function entity_validator_plugins() {
  * @param $bundle
  *  The bundle name.
  *
- * @return AbstractValidate
+ * @return AbstractEntityValidate
  */
 function entity_validator_load_validator($entity_type, $bundle) {
   $plugins = entity_validator_plugins();

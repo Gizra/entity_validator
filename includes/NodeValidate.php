@@ -13,7 +13,7 @@ class NodeValidate extends AbstractEntityValidate {
    * Overriding. The node entity must have a label!.
    */
   public function validate() {
-    if (!in_array('title', array_keys($this->fields))) {
+    if (empty($this->fields['title'])) {
       $this->setError(t('The title is missing'));
     }
 
