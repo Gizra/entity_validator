@@ -8,7 +8,7 @@
 /**
  * Implements hook_ctools_plugin_type().
  */
-function node_validator_ctools_plugin_type() {
+function entity_validator_ctools_plugin_type() {
   $plugins['validator'] = array(
     'classes' => array('class'),
   );
@@ -22,7 +22,7 @@ function node_validator_ctools_plugin_type() {
  * @return array
  *   All plugins relate to node validator.
  */
-function node_validator_plugins() {
+function entity_validator_plugins() {
   ctools_include('plugins');
   return ctools_get_plugins('node_validator', 'validator');
 }
@@ -37,7 +37,7 @@ function node_validator_plugins() {
  *
  * @return AbstractValidate
  */
-function node_validator_load_validator($entity_type, $bundle) {
+function entity_validator_load_validator($entity_type, $bundle) {
   $plugins = node_validator_plugins();
 
   foreach ($plugins as $plugin) {

@@ -1,6 +1,9 @@
 <?php
 
-abstract class AbstractValidate implements Validate {
+/**
+ * Abstract entity validation.
+ */
+abstract class AbstractEntityValidate implements EntityValidateInterface {
 
   /**
    * The entity type.
@@ -52,6 +55,13 @@ abstract class AbstractValidate implements Validate {
   public function setEntityType($entity_type) {
     $this->entityType = $entity_type;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityType() {
+    return $this->entityType;
   }
 
   /**

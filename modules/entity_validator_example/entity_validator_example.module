@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function entity_validator_example_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'entity_validator') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function entity_validator_example_menu() {
+  $items = array();
+
+  $items['entity_validator_example/example'] = array(
+    'title' => 'example',
+    'page callback' => 'entity_validator_example_example',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback;
+ */
+function entity_validator_example_example() {
+  entity_validator_load_validator('entity', 'article')
+    ->addField('title', 'foo')
+    ->validate();
+  return '';
+}

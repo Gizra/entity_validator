@@ -1,6 +1,6 @@
 <?php
 
-interface Validate {
+interface EntityValidateInterface {
 
   /**
    * Set the bundle of the node.
@@ -26,6 +26,13 @@ interface Validate {
    * @return $this
    */
   public function setEntityType($entity);
+
+  /**
+   * Return the entity type.
+   *
+   * @return String
+   */
+  public function getEntityType();
 
   /**
    * Adding the field the validation process.

@@ -3,6 +3,6 @@ core = 7.x
 dependencies[] = node
 dependencies[] = entity
 
-files[] = includes/InterfaceValidate.php
-files[] = includes/AbstractValidate.php
+files[] = includes/EntityValidateInterface.php
+files[] = includes/AbstractEntityValidate.php
 files[] = includes/NodeValidate.php
