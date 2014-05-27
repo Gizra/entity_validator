@@ -79,4 +79,64 @@ interface EntityValidateInterface {
    *  of the error.
    */
   public function setError($message);
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isText($value);
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isNumeric($value);
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isUnique($value);
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isList($value);
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isYear($value);
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isUnixTimeStamp($value);
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphDate(&$value);
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphText(&$value);
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphList(&$value);
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphUnique(&$value);
 }
