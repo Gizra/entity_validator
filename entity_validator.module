@@ -24,7 +24,7 @@ function entity_validator_ctools_plugin_type() {
  */
 function entity_validator_plugins() {
   ctools_include('plugins');
-  return ctools_get_plugins('node_validator', 'validator');
+  return ctools_get_plugins('entity_validator', 'validator');
 }
 
 /**
