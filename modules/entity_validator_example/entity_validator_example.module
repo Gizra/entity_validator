@@ -25,10 +25,10 @@ function entity_validator_example_menu() {
 }
 
 /**
- * Page callback;
+ * Page callback; This validate will fail on purpose.
  */
 function entity_validator_example_example() {
-  entity_validator_load_validator('entity', 'article')
+  entity_validator_load_validator('node', 'article')
     ->addField('title', 'foo')
     ->validate();
   return '';
