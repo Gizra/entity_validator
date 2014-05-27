@@ -139,4 +139,84 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   public function setError($message) {
     $this->errors[] = $message;
   }
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isText($value) {
+    // TODO: Implement isText() method.
+  }
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isNumeric($value) {
+    // TODO: Implement isNumeric() method.
+  }
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isUnique($value) {
+    // TODO: Implement isUnique() method.
+  }
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isList($value) {
+    // TODO: Implement isList() method.
+  }
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isYear($value) {
+    // TODO: Implement isYear() method.
+  }
+
+  /**
+   * @param $value
+   * @return boolean
+   */
+  public function isUnixTimeStamp($value) {
+    // TODO: Implement isUnixTimeStamp() method.
+  }
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphDate(&$value) {
+    // TODO: Implement morphDate() method.
+  }
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphText(&$value) {
+    // TODO: Implement morphText() method.
+  }
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphList(&$value) {
+    // TODO: Implement morphList() method.
+  }
+
+  /**
+   * @param $value
+   * @return $this
+   */
+  public function morphUnique(&$value) {
+    // TODO: Implement morphUnique() method.
+  }
 }
