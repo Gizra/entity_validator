@@ -38,11 +38,13 @@ function entity_validator_plugins() {
  * @return AbstractValidate
  */
 function entity_validator_load_validator($entity_type, $bundle) {
-  $plugins = node_validator_plugins();
+  $plugins = entity_validator_plugins();
 
   foreach ($plugins as $plugin) {
     if ($entity_type == $plugin['entity_type'] && $bundle == $plugin['bundle']) {
       require_once $plugin['path'] . '/' . $plugin['class'] . '.php';
+
+      /** @var AbstractEntityValidate $validator */
       $validator = new $plugin['class'];
 
       return $validator->setBundle($bundle);

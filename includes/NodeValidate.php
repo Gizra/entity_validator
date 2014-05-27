@@ -1,16 +1,12 @@
 <?php
 
 /**
- * Class NodeValidate
- *
- * Although the module used for node validation the parent class,
- * AbstractValidate, can be used for any entity type.
+ * Validate the node object.
  */
 class NodeValidate extends AbstractEntityValidate {
 
   public function __construct() {
     $this->entityType = 'node';
-    $this->errorLevel = 0;
   }
 
   /**

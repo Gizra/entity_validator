@@ -6,3 +6,7 @@ dependencies[] = entity
 files[] = includes/EntityValidateInterface.php
 files[] = includes/AbstractEntityValidate.php
 files[] = includes/NodeValidate.php
+files[] = includes/CommentValidate.php
+files[] = includes/TaxonomyTermValidate.php
+files[] = includes/UserValidate.php
+files[] = includes/VocabualryValidate.php
