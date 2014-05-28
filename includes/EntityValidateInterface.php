@@ -93,7 +93,7 @@ interface EntityValidateInterface {
    * @param $value
    *  The value of the field.
    *
-   * @return $this
+   * @return boolean
    */
   public function isText($value);
 
@@ -103,7 +103,7 @@ interface EntityValidateInterface {
    * @param $value
    *  The value of the field.
    *
-   * @return $this
+   * @return boolean
    */
   public function isNumeric($value);
 
@@ -113,7 +113,7 @@ interface EntityValidateInterface {
    * @param $value
    *  The value of the field.
    *
-   * @return $this
+   * @return boolean
    */
   public function isList($value);
 
@@ -123,7 +123,7 @@ interface EntityValidateInterface {
    * @param $value
    *  The value of the field.
    *
-   * @return $this
+   * @return boolean
    */
   public function isYear($value);
 
@@ -133,7 +133,7 @@ interface EntityValidateInterface {
    * @param $value
    *  The value of the field.
    *
-   * @return $this
+   * @return boolean
    */
   public function isUnixTimeStamp($value);
 
@@ -142,7 +142,8 @@ interface EntityValidateInterface {
    *
    * @param $value
    *  The value we need to change.
-   * @return $this
+   *
+   * @return mixed
    */
   public function morphDate($value);
 
@@ -151,7 +152,8 @@ interface EntityValidateInterface {
    *
    * @param $value
    *  The value we need to change.
-   * @return $this
+   *
+   * @return mixed
    */
   public function morphText($value);
 
@@ -160,7 +162,8 @@ interface EntityValidateInterface {
    *
    * @param $value
    *  The value we need to change.
-   * @return $this
+   *
+   * @return mixed
    */
   public function morphList($value);
 
@@ -169,7 +172,8 @@ interface EntityValidateInterface {
    *
    * @param $value
    *  The value we need to change.
-   * @return $this
+   *
+   * @return mixed
    */
   public function morphUnique($value);
 }
