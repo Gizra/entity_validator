@@ -188,13 +188,16 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function isUnixTimeStamp($value) {
-    // todo: Fix this when passing timestamp.
-    $timestamp = ((string) $value === (int) $value) && ($value <= PHP_INT_MAX) && ($value >= ~PHP_INT_MAX);
-    if (!$timestamp) {
+    if (is_string($value)) {
+      $this->setError = t("The time stamp can't be a string");
+      return;
+    }
+
+    if (!($value <= PHP_INT_MAX) && ($value >= ~PHP_INT_MAX)) {
       $params = array(
         '@value' => $value,
       );
-      $this->setError(t('The give value(@value) is not a time stamp format', $params));
+      $this->setError(t('The give value(@value) is not a time stamp format since the given value is out of range.', $params));
     }
   }
 
@@ -202,7 +205,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function morphDate($value) {
-    return strtotime($value);
+    return time();
   }
 
   /**
