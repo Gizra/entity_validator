@@ -141,6 +141,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
+   * Verify if the given value .
    * @param $value
    * @return boolean
    */
