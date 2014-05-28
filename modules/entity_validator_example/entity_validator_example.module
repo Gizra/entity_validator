@@ -29,7 +29,7 @@ function entity_validator_example_menu() {
  */
 function entity_validator_example_example() {
   $validator = entity_validator_load_validator('node', 'article')
-    ->addField('title', 'foo')
+    ->addField('title', '')
     ->addField('field_date', '1/25/1950');
 
   try {

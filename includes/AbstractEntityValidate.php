@@ -90,51 +90,64 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function fieldsMetaData() {
-    return array();
+  public function getFieldsInfo() {
+    $fields_info = array();
+    $entity_info = entity_get_info($this->entityType);
+    $keys = $entity_info['entity keys'];
+
+    // When the entity has a label key we need to verify it's not empty.
+    if (!empty($keys['label'])) {
+      $fields_info[$keys['label']] = array(
+        'validators' => array(
+          array($this, 'isNotEmpty'),
+        ),
+      );
+    }
+
+    return $fields_info;
   }
 
   /**
    * {@inheritdoc}
    */
   public function validate() {
+    $fields_info = $this->getFieldsInfo();
 
-    // Collect the fields callbacks.
-    if ($validators = $this->fieldsMetaData()) {
-       foreach ($validators as $field => $metadata) {
-         foreach ($metadata['validators'] as $validator) {
-           call_user_func_array($validator, array($this->fields[$field], $field));
-         }
-
-         foreach ($metadata['morphers'] as $validator) {
-           $this->fields[$field] = call_user_func_array($validator, array($this->fields[$field]));
-         }
-       }
-    }
-
-    foreach ($this->fields as $field => $value) {
-      // Loading some default value of the fields and the instance.
+    foreach (array_keys($this->fields) as $field) {
+      // Loading default value of the fields and the instance.
       $field_info = field_info_field($field);
       $field_type_info = field_info_field_types($field_info['type']);
       $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
 
-      if ($instance_info['required'] && empty($value)) {
-        $this->setError(t('Field %name is empty', array('%name' => $instance_info['label'])));
+      if ($instance_info['required']) {
+        $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
       }
-      else {
-        // Use the entity API validation.
-        if (isset($field_type_info['property_type']) && !entity_property_verify_data_type($value, $field_type_info['property_type'])) {
-          $params = array(
-            '%value' => (String) $value,
-            '%field-label' => $instance_info['label'],
-          );
 
-          $this->setError(t('The value %value is invalid for the field %field-label', $params));
-          continue;
+      if (isset($field_type_info['property_type'])) {
+        $fields_info[$field]['validators'][] = array($this, 'isValidValue', array($field, $field_type_info['property_type']));
+      }
+    }
+
+    // Collect the fields callbacks.
+    if ($fields_info) {
+      foreach ($fields_info as $field => $info) {
+        if (!empty($info['validators'])) {
+          $info['validators'] = array_unique($info['validators']);
+          foreach ($info['validators'] as $validator) {
+            call_user_func_array($validator, array($this->fields[$field], $field));
+          }
+        }
+
+        if (!empty($info['preprocess'])) {
+          $info['preprocess'] = array_unique($info['preprocess']);
+          foreach ($info['preprocess'] as $validator) {
+            $this->fields[$field] = call_user_func_array($validator, array($this->fields[$field]));
+          }
         }
       }
     }
 
+    // Display the error.
     if (!empty($this->errors)) {
       $params = array(
         '@errors' => implode(", ", $this->errors),
@@ -254,28 +267,43 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function morphDate($value) {
+  public function isValidValue($value, $field, $type) {
+    // todo: Check if this thing actually work.
+    if (entity_property_verify_data_type($value, $type)) {
+      $params = array(
+        '%value' => (String) $value,
+        '%field-label' => $field,
+      );
+
+      $this->setError(t('The value %value is invalid for the field %field-label', $params));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preprocessDate($value) {
     return time();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function morphText($value) {
+  public function preprocessText($value) {
     // TODO: Implement morphText() method.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function morphList($value) {
+  public function preprocessList($value) {
     // TODO: Implement morphList() method.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function morphUnique($value) {
+  public function preprocessUnique($value) {
     // TODO: Implement morphUnique() method.
   }
 }

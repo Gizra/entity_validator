@@ -68,7 +68,7 @@ interface EntityValidateInterface {
    *
    * @return Array.
    */
-  public function fieldsMetaData();
+  public function getFieldsInfo();
 
   /**
    * Initialize the validate process.
@@ -160,6 +160,22 @@ interface EntityValidateInterface {
   public function isUnixTimeStamp($value, $field);
 
   /**
+   * Special validate callback: usually all the validator have two arguments,
+   * value and field. This validate method check the value of the field using
+   * the entity API module.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   * @param $type
+   *  The type of the field.
+   *
+   * @return boolean
+   */
+  public function isValidValue($value, $field, $type);
+
+  /**
    * Change the given value to a date format.
    *
    * @param $value
@@ -167,7 +183,7 @@ interface EntityValidateInterface {
    *
    * @return mixed
    */
-  public function morphDate($value);
+  public function preprocessDate($value);
 
   /**
    * Wrap the value to a text format value.
@@ -177,7 +193,7 @@ interface EntityValidateInterface {
    *
    * @return mixed
    */
-  public function morphText($value);
+  public function preprocessText($value);
 
   /**
    * Change the given value from a single value to a multiple value.
@@ -187,7 +203,7 @@ interface EntityValidateInterface {
    *
    * @return mixed
    */
-  public function morphList($value);
+  public function preprocessList($value);
 
   /**
    * Apply array_unique on the given value.
@@ -197,5 +213,5 @@ interface EntityValidateInterface {
    *
    * @return mixed
    */
-  public function morphUnique($value);
+  public function preprocessUnique($value);
 }
