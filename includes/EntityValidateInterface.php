@@ -88,54 +88,76 @@ interface EntityValidateInterface {
   public function setError($message);
 
   /**
-   * Check if the field is a text field.
-
+   * Verify the field is not empty.
+   *
    * @param $value
    *  The value of the field.
+   * @param $field
+   *  The field name.
    *
    * @return boolean
    */
-  public function isText($value);
+  public function isNotEmpty($value, $field);
+
+  /**
+   * Check if the field is a text field.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
+   */
+  public function isText($value, $field);
 
   /**
    * Check if the field is numeric field.
    *
    * @param $value
    *  The value of the field.
+   * @param $field
+   *  The field name.
    *
    * @return boolean
    */
-  public function isNumeric($value);
+  public function isNumeric($value, $field);
 
   /**
    * Verify the field is a list AKA array.
    *
    * @param $value
    *  The value of the field.
+   * @param $field
+   *  The field name.
    *
    * @return boolean
    */
-  public function isList($value);
+  public function isList($value, $field);
 
   /**
    * Verify if the field present only a year.
    *
    * @param $value
    *  The value of the field.
+   * @param $field
+   *  The field name.
    *
    * @return boolean
    */
-  public function isYear($value);
+  public function isYear($value, $field);
 
   /**
    * Verify the given integer is a unix timestamp format integer.
    *
    * @param $value
    *  The value of the field.
+   * @param $field
+   *  The field name.
    *
    * @return boolean
    */
-  public function isUnixTimeStamp($value);
+  public function isUnixTimeStamp($value, $field);
 
   /**
    * Change the given value to a date format.

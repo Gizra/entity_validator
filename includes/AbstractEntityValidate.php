@@ -103,7 +103,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
     if ($validators = $this->fieldsMetaData()) {
        foreach ($validators as $field => $metadata) {
          foreach ($metadata['validators'] as $validator) {
-           call_user_func_array($validator, array($this->fields[$field]));
+           call_user_func_array($validator, array($this->fields[$field], $field));
          }
 
          foreach ($metadata['morphers'] as $validator) {
@@ -156,13 +156,26 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function isText($value) {
+  public function isNotEmpty($value, $field) {
+    if (empty($value)) {
+      $params = array(
+        '@field' => $field,
+      );
+
+      $this->setError(t("The field @field can't be empty", $params));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isText($value, $field) {
     if (!is_string($value)) {
       $params = array(
         '@value' => $value,
       );
 
-      $this->setError('The given value(@value)is not a string', $params);
+      $this->setError('The given value(@value) is not a string', $params);
       return;
     }
 
@@ -172,7 +185,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function isNumeric($value) {
+  public function isNumeric($value, $field) {
     if (!is_int($value)) {
       $params = array(
         '@value' => $value,
@@ -188,7 +201,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function isList($value) {
+  public function isList($value, $field) {
     if (!is_array($value)) {
       $params = array(
         '@value' => $value,
@@ -204,7 +217,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function isYear($value) {
+  public function isYear($value, $field) {
     if (!is_numeric($value) || (is_numeric($value) && $value > 9999)) {
       $params = array(
         '@value' => $value,
@@ -220,7 +233,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function isUnixTimeStamp($value) {
+  public function isUnixTimeStamp($value, $field) {
     if (is_string($value)) {
       $this->setError(t("The time stamp can't be a string"));
       return;
