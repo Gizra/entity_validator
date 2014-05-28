@@ -67,8 +67,8 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function addField($name, $value) {
-    $this->fields[$name] = $value;
+  public function addField($name, $callbacks) {
+    $this->fields[$name] = $callbacks;
     return $this;
   }
 
@@ -90,7 +90,28 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
+  public function fieldsMetaData() {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function validate() {
+
+    // Collect the fields callbacks.
+    if ($validators = $this->fieldsMetaData()) {
+       foreach ($validators as $field => $metadata) {
+         foreach ($metadata['validators'] as $validator) {
+           call_user_func_array($validator, array($this->fields[$field]));
+         }
+
+         foreach ($metadata['morphers'] as $validator) {
+           $this->fields[$field] = call_user_func_array($validator, array($this->fields[$field]));
+         }
+       }
+    }
+
     foreach ($this->fields as $field => $value) {
       // Loading some default value of the fields and the instance.
       $field_info = field_info_field($field);
@@ -110,15 +131,6 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
 
           $this->setError(t('The value %value is invalid for the field %field-label', $params));
           continue;
-        }
-
-        // Node validator validations passed.
-        if (isset($field_type_info['node_validator_callback'])) {
-          foreach ($field_type_info['node_validator_callback'] as $callback) {
-            if (!call_user_func_array($callback, array($this, $value))) {
-              $this->setError(t('The given format is not valid: %format', array('%format' => $value)));
-            }
-          }
         }
       }
     }
@@ -141,83 +153,76 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * Verify if the given value .
-   * @param $value
-   * @return boolean
+   * {@inheritdoc}
    */
   public function isText($value) {
-    // TODO: Implement isText() method.
+    if (!is_string($value)) {
+      $this->setError('');
+    }
+
+    return $this;
   }
 
   /**
-   * @param $value
-   * @return boolean
+   * {@inheritdoc}
    */
   public function isNumeric($value) {
     // TODO: Implement isNumeric() method.
   }
 
   /**
-   * @param $value
-   * @return boolean
-   */
-  public function isUnique($value) {
-    // TODO: Implement isUnique() method.
-  }
-
-  /**
-   * @param $value
-   * @return boolean
+   * {@inheritdoc}
    */
   public function isList($value) {
     // TODO: Implement isList() method.
   }
 
   /**
-   * @param $value
-   * @return boolean
+   * {@inheritdoc}
    */
   public function isYear($value) {
     // TODO: Implement isYear() method.
   }
 
   /**
-   * @param $value
-   * @return boolean
+   * {@inheritdoc}
    */
   public function isUnixTimeStamp($value) {
-    // TODO: Implement isUnixTimeStamp() method.
+    // todo: Fix this when passing timestamp.
+    $timestamp = ((string) $value === (int) $value) && ($value <= PHP_INT_MAX) && ($value >= ~PHP_INT_MAX);
+    if (!$timestamp) {
+      $params = array(
+        '@value' => $value,
+      );
+      $this->setError(t('The give value(@value) is not a time stamp format', $params));
+    }
   }
 
   /**
-   * @param $value
-   * @return $this
+   * {@inheritdoc}
    */
-  public function morphDate(&$value) {
-    // TODO: Implement morphDate() method.
+  public function morphDate($value) {
+    return strtotime($value);
   }
 
   /**
-   * @param $value
-   * @return $this
+   * {@inheritdoc}
    */
-  public function morphText(&$value) {
+  public function morphText($value) {
     // TODO: Implement morphText() method.
   }
 
   /**
-   * @param $value
-   * @return $this
+   * {@inheritdoc}
    */
-  public function morphList(&$value) {
+  public function morphList($value) {
     // TODO: Implement morphList() method.
   }
 
   /**
-   * @param $value
-   * @return $this
+   * {@inheritdoc}
    */
-  public function morphUnique(&$value) {
+  public function morphUnique($value) {
     // TODO: Implement morphUnique() method.
   }
 }

@@ -28,8 +28,14 @@ function entity_validator_example_menu() {
  * Page callback; This validate will fail on purpose.
  */
 function entity_validator_example_example() {
-  entity_validator_load_validator('node', 'article')
+  $validator = entity_validator_load_validator('node', 'article')
     ->addField('title', 'foo')
-    ->validate();
+    ->addField('field_date', '1/25/1950');
+
+  try {
+    $validator->validate();
+  } catch (Exception $e) {
+    drupal_set_message($e->getMessage(), 'error');
+  }
   return '';
 }

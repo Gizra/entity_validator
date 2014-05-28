@@ -1,4 +1,4 @@
 name = Node validator example
 core = 7.x
 
-dependencies[] = node_validator
+dependencies[] = entity_validator

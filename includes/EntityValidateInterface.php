@@ -64,6 +64,13 @@ interface EntityValidateInterface {
   public function setFields($fields);
 
   /**
+   * Set field validation and morphers.
+   *
+   * @return Array.
+   */
+  public function fieldsMetaData();
+
+  /**
    * Initialize the validate process.
    */
   public function validate();
@@ -81,62 +88,88 @@ interface EntityValidateInterface {
   public function setError($message);
 
   /**
+   * Check if the field is a text field.
+
    * @param $value
-   * @return boolean
+   *  The value of the field.
+   *
+   * @return $this
    */
   public function isText($value);
 
   /**
+   * Check if the field is numeric field.
+   *
    * @param $value
-   * @return boolean
+   *  The value of the field.
+   *
+   * @return $this
    */
   public function isNumeric($value);
 
   /**
+   * Verify the field is a list AKA array.
+   *
    * @param $value
-   * @return boolean
-   */
-  public function isUnique($value);
-
-  /**
-   * @param $value
-   * @return boolean
+   *  The value of the field.
+   *
+   * @return $this
    */
   public function isList($value);
 
   /**
+   * Verify if the field present only a year.
+   *
    * @param $value
-   * @return boolean
+   *  The value of the field.
+   *
+   * @return $this
    */
   public function isYear($value);
 
   /**
+   * Verify the given integer is a unix timestamp format integer.
+   *
    * @param $value
-   * @return boolean
+   *  The value of the field.
+   *
+   * @return $this
    */
   public function isUnixTimeStamp($value);
 
   /**
+   * Change the given value to a date format.
+   *
    * @param $value
+   *  The value we need to change.
    * @return $this
    */
-  public function morphDate(&$value);
+  public function morphDate($value);
 
   /**
+   * Wrap the value to a text format value.
+   *
    * @param $value
+   *  The value we need to change.
    * @return $this
    */
-  public function morphText(&$value);
+  public function morphText($value);
 
   /**
+   * Change the given value from a single value to a multiple value.
+   *
    * @param $value
+   *  The value we need to change.
    * @return $this
    */
-  public function morphList(&$value);
+  public function morphList($value);
 
   /**
+   * Apply array_unique on the given value.
+   *
    * @param $value
+   *  The value we need to change.
    * @return $this
    */
-  public function morphUnique(&$value);
+  public function morphUnique($value);
 }
