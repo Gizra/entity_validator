@@ -139,6 +139,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
       $params = array(
         '@errors' => implode(", ", $this->errors),
       );
+
       throw new Exception(t('The validation process failed: @errors', $params));
     }
 
@@ -157,31 +158,63 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    */
   public function isText($value) {
     if (!is_string($value)) {
-      $this->setError('');
+      $params = array(
+        '@value' => $value,
+      );
+
+      $this->setError('The given value(@value)is not a string', $params);
+      return;
     }
 
-    return $this;
+    return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function isNumeric($value) {
-    // TODO: Implement isNumeric() method.
+    if (!is_int($value)) {
+      $params = array(
+        '@value' => $value,
+      );
+
+      $this->setError('The given value(@value) is not an integer', $params);
+      return;
+    }
+
+    return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function isList($value) {
-    // TODO: Implement isList() method.
+    if (!is_array($value)) {
+      $params = array(
+        '@value' => $value,
+      );
+
+      $this->setError('The given value(@value) is not an array', $params);
+      return;
+    }
+
+    return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function isYear($value) {
-    // TODO: Implement isYear() method.
+    if (!is_numeric($value) || (is_numeric($value) && $value > 9999)) {
+      $params = array(
+        '@value' => $value,
+      );
+
+      $this->setError('The given value(@value) is not an year', $params);
+      return;
+    }
+
+    return TRUE;
   }
 
   /**
@@ -189,7 +222,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    */
   public function isUnixTimeStamp($value) {
     if (is_string($value)) {
-      $this->setError = t("The time stamp can't be a string");
+      $this->setError(t("The time stamp can't be a string"));
       return;
     }
 
@@ -197,8 +230,12 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
       $params = array(
         '@value' => $value,
       );
+
       $this->setError(t('The give value(@value) is not a time stamp format since the given value is out of range.', $params));
+      return;
     }
+
+    return TRUE;
   }
 
   /**
