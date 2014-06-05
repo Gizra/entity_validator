@@ -5,7 +5,7 @@ class NodeValidatorExampleArticleValidator extends NodeValidate {
   /**
    * {@inheritdoc}
    */
-  public function fieldsMetaData() {
+  public function getFieldsInfo() {
     return parent::getFieldsInfo() +  array(
       'field_date' => array(
         'validators' => array(
