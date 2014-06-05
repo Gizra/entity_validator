@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * Define the name fo the content type we will use during the example.
+ */
+define('ENTITY_VALIDATOR_EXAMPLE_CONTENT_TYPE', 'validator_example_content_type');
+
+/**
  * Implements hook_ctools_plugin_directory().
  */
 function entity_validator_example_ctools_plugin_directory($module, $plugin) {

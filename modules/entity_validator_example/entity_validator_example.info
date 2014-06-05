@@ -2,3 +2,4 @@ name = Node validator example
 core = 7.x
 
 dependencies[] = entity_validator
+dependencies[] = date
