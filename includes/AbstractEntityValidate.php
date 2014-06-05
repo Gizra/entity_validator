@@ -124,7 +124,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
       }
 
       if (isset($field_type_info['property_type'])) {
-        $fields_info[$field]['validators'][] = array($this, 'isValidValue', array($field, $field_type_info['property_type']));
+        $this->isValidValue($this->fields[$field], $field, $field_type_info['property_type']);
       }
     }
 
@@ -268,8 +268,7 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function isValidValue($value, $field, $type) {
-    // todo: Check if this thing actually work.
-    if (entity_property_verify_data_type($value, $type)) {
+    if (!entity_property_verify_data_type($value, $type)) {
       $params = array(
         '%value' => (String) $value,
         '%field-label' => $field,
