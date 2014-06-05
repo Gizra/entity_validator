@@ -112,7 +112,6 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    */
   public function validate() {
     $fields_info = $this->getFieldsInfo();
-
     foreach (array_keys($this->fields) as $field) {
       // Loading default value of the fields and the instance.
       $field_info = field_info_field($field);
@@ -140,8 +139,8 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
 
         if (!empty($info['preprocess'])) {
           $info['preprocess'] = array_unique($info['preprocess']);
-          foreach ($info['preprocess'] as $validator) {
-            $this->fields[$field] = call_user_func_array($validator, array($this->fields[$field]));
+          foreach ($info['preprocess'] as $preprocess) {
+            $this->fields[$field] = call_user_func_array($preprocess, array($this->fields[$field], $field));
           }
         }
       }
@@ -281,28 +280,37 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function preprocessDate($value) {
+  public function preprocessDate($value, $field) {
+    $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
+
+    if (!$instance_info) {
+      // The field not relate to the bundle.
+      return;
+    }
+    if (is_int($value)) {
+
+    }
     return time();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessText($value) {
+  public function preprocessText($value, $field) {
     // TODO: Implement morphText() method.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessList($value) {
+  public function preprocessList($value, $field) {
     // TODO: Implement morphList() method.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessUnique($value) {
+  public function preprocessUnique($value, $field) {
     // TODO: Implement morphUnique() method.
   }
 }
