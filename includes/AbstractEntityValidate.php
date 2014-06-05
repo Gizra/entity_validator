@@ -112,35 +112,34 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    */
   public function validate() {
     $fields_info = $this->getFieldsInfo();
-    foreach (array_keys($this->fields) as $field) {
-      // Loading default value of the fields and the instance.
-      $field_info = field_info_field($field);
-      $field_type_info = field_info_field_types($field_info['type']);
-      $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
-
-      if ($instance_info['required']) {
-        $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
-      }
-
-      if (isset($field_type_info['property_type'])) {
-        $this->isValidValue($this->fields[$field], $field, $field_type_info['property_type']);
-      }
-    }
 
     // Collect the fields callbacks.
     if ($fields_info) {
       foreach ($fields_info as $field => $info) {
-        if (!empty($info['validators'])) {
-          $info['validators'] = array_unique($info['validators']);
-          foreach ($info['validators'] as $validator) {
-            call_user_func_array($validator, array($this->fields[$field], $field));
-          }
-        }
-
         if (!empty($info['preprocess'])) {
           $info['preprocess'] = array_unique($info['preprocess']);
           foreach ($info['preprocess'] as $preprocess) {
             $this->fields[$field] = call_user_func_array($preprocess, array($this->fields[$field], $field));
+          }
+        }
+
+        // Loading default value of the fields and the instance.
+        $field_info = field_info_field($field);
+        $field_type_info = field_info_field_types($field_info['type']);
+        $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
+
+        if ($instance_info['required']) {
+          $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
+        }
+
+        if (isset($field_type_info['property_type'])) {
+          $this->isValidValue($this->fields[$field], $field, $field_type_info['property_type']);
+        }
+
+        if (!empty($info['validators'])) {
+          $info['validators'] = array_unique($info['validators']);
+          foreach ($info['validators'] as $validator) {
+            call_user_func_array($validator, array($this->fields[$field], $field));
           }
         }
       }
@@ -280,37 +279,30 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function preprocessDate($value, $field) {
-    $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
-
-    if (!$instance_info) {
-      // The field not relate to the bundle.
-      return;
-    }
-    if (is_int($value)) {
-
-    }
-    return time();
+  public function preprocessDate($value) {
+    return strtotime($value);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessText($value, $field) {
-    // TODO: Implement morphText() method.
+  public function preprocessText($value) {
+    return array(
+      'value' => $value,
+    );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessList($value, $field) {
-    // TODO: Implement morphList() method.
+  public function preprocessList($value) {
+    return array($value);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessUnique($value, $field) {
-    // TODO: Implement morphUnique() method.
+  public function preprocessUnique($value) {
+    return array_unique($value);
   }
 }

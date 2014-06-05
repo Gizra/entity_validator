@@ -180,50 +180,38 @@ interface EntityValidateInterface {
    *
    * @param $value
    *  The value we need to change.
-   * @param $field
-   *  The name of the field. Used for get the info on the way the need to be
-   *  stored.
    *
    * @return mixed
    */
-  public function preprocessDate($value, $field);
+  public function preprocessDate($value);
 
   /**
    * Wrap the value to a text format value.
    *
    * @param $value
    *  The value we need to change.
-   * @param $field
-   *  The name of the field. Used for get the info on the way the need to be
-   *  stored.
    *
    * @return mixed
    */
-  public function preprocessText($value, $field);
+  public function preprocessText($value);
 
   /**
    * Change the given value from a single value to a multiple value.
    *
    * @param $value
    *  The value we need to change.
-   * @param $field
-   *  The name of the field. Used for get the info on the way the need to be
-   *  stored.
    *
    * @return mixed
    */
-  public function preprocessList($value, $field);
+  public function preprocessList($value);
 
   /**
    * Apply array_unique on the given value.
    *
    * @param $value
    *  The value we need to change.
-   * @param $field
-   *  The name of the field. Used for get the info on the way the need to be
-   *  stored.
    *
    * @return mixed
    */
-  public function preprocessUnique($value, $field);
+  public function preprocessUnique($value);
 }
