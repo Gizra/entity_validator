@@ -42,7 +42,11 @@ function entity_validator_load_validator($entity_type, $bundle) {
 
   foreach ($plugins as $plugin) {
     if ($entity_type == $plugin['entity_type'] && $bundle == $plugin['bundle']) {
-      require_once $plugin['path'] . '/' . $plugin['class'] . '.php';
+      $file = $plugin['path'] . '/' . $plugin['class'] . '.php';
+
+      if (file_exists($file)) {
+        require_once $file;
+      }
 
       /** @var AbstractEntityValidate $validator */
       $validator = new $plugin['class'];
