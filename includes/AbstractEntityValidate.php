@@ -67,8 +67,15 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function addField($name, $callbacks) {
-    $this->fields[$name] = $callbacks;
+  public function addField($field, $value) {
+    $fields = explode(":", $field);
+
+    if (count($fields) == 2) {
+      $this->fields[$fields[0]][$fields[1]] = $value;
+    }
+    else {
+      $this->fields[$field] = $value;
+    }
     return $this;
   }
 
