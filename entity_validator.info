@@ -3,13 +3,9 @@ description = "Programmatically validate entities."
 core = 7.x
 dependencies[] = entity
 
+; Handlers
+files[] = includes/EntityValidateBase.php
 files[] = includes/EntityValidateInterface.php
-files[] = includes/AbstractEntityValidate.php
-files[] = includes/NodeValidate.php
-files[] = includes/CommentValidate.php
-files[] = includes/TaxonomyTermValidate.php
-files[] = includes/UserValidate.php
-files[] = includes/VocabualryValidate.php
 
 ; Tests
 files[] = tests/EntityValidatorTestCase.test

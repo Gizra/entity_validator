@@ -3,6 +3,14 @@
 interface EntityValidateInterface {
 
   /**
+   * Constructor for the Validator handler.
+   *
+   * @param $plugin
+   *   The validator plugin object.
+   */
+  public function __construct($plugin);
+
+  /**
    * Set the bundle of the node.
    *
    * @param $bundle
