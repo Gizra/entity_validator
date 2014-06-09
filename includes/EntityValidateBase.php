@@ -3,7 +3,7 @@
 /**
  * Abstract entity validation.
  */
-abstract class AbstractEntityValidate implements EntityValidateInterface {
+abstract class EntityValidateBase implements EntityValidateInterface {
 
   /**
    * The entity type.
@@ -32,6 +32,18 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
    * @var Array
    */
   protected $errors = array();
+
+  /**
+   * Constructs a EntityValidateBase object.
+   *
+   * @param array $plugin
+   *   Plugin definition.
+   */
+  public function __construct($plugin) {
+    $this->plugin = $plugin;
+    $this->entityType = $plugin['entity_type'];
+    $this->bundle = $plugin['bundle'];
+  }
 
   /**
    * {@inheritdoc}
@@ -117,48 +129,54 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate() {
+  public function validate($entity) {
     $fields_info = $this->getFieldsInfo();
+    $wrapper = entity_metadata_wrapper($this->entityType, $entity);
 
     // Collect the fields callbacks.
-    if ($fields_info) {
-      foreach ($fields_info as $field => $info) {
-        if (!empty($info['preprocess'])) {
-          $info['preprocess'] = array_unique($info['preprocess']);
-          foreach ($info['preprocess'] as $preprocess) {
-            $this->fields[$field] = call_user_func_array($preprocess, array($this->fields[$field], $field));
+    foreach ($fields_info as $field => $info) {
+      if (!empty($info['preprocess'])) {
+        $info['preprocess'] = array_unique($info['preprocess']);
+        foreach ($info['preprocess'] as $preprocess) {
+          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+
+          if ($wrapper->__isset($field)) {
+            // Setting the fields value with the wrapper.
+            $wrapper->{$field}->set(call_user_func_array($preprocess, array($value, $field)));
           }
         }
+      }
 
-        // Loading default value of the fields and the instance.
-        $field_info = field_info_field($field);
-        $field_type_info = field_info_field_types($field_info['type']);
-        $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
+      // Loading default value of the fields and the instance.
+      $field_info = field_info_field($field);
+      $field_type_info = field_info_field_types($field_info['type']);
+      $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
 
-        if ($instance_info['required']) {
-          $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
-        }
+      if ($instance_info['required']) {
+        $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
+      }
 
-        if (isset($field_type_info['property_type'])) {
-          $this->isValidValue($this->fields[$field], $field, $field_type_info['property_type']);
-        }
+      if (isset($field_type_info['property_type'])) {
+        $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+        $this->isValidValue($value, $field, $field_type_info['property_type']);
+      }
 
-        if (!empty($info['validators'])) {
-          $info['validators'] = array_unique($info['validators']);
-          foreach ($info['validators'] as $validator) {
-            call_user_func_array($validator, array($this->fields[$field], $field));
-          }
+      if (!empty($info['validators'])) {
+        $info['validators'] = array_unique($info['validators']);
+        foreach ($info['validators'] as $validator) {
+          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+          call_user_func_array($validator, array($value, $field));
         }
       }
     }
 
-    // Display the error.
+    // Throwing exception with the errors.
     if (!empty($this->errors)) {
       $params = array(
         '@errors' => implode(", ", $this->errors),
       );
 
-      throw new Exception(t('The validation process failed: @errors', $params));
+      throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
     }
 
     return TRUE;
@@ -172,7 +190,14 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify the field is not empty.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isNotEmpty($value, $field) {
     if (empty($value)) {
@@ -185,7 +210,14 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Check if the field is a text field.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isText($value, $field) {
     if (!is_string($value)) {
@@ -201,7 +233,14 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Check if the field is numeric field.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isNumeric($value, $field) {
     if (!is_int($value)) {
@@ -217,7 +256,14 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify the field is a list AKA array.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isList($value, $field) {
     if (!is_array($value)) {
@@ -233,7 +279,14 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify if the field present only a year.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isYear($value, $field) {
     if (!is_numeric($value) || (is_numeric($value) && $value > 9999)) {
@@ -249,7 +302,14 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify the given integer is a unix timestamp format integer.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isUnixTimeStamp($value, $field) {
     if (is_string($value)) {
@@ -270,7 +330,18 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Special validate callback: usually all the validator have two arguments,
+   * value and field. This validate method check the value of the field using
+   * the entity API module.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   * @param $type
+   *  The type of the field.
+   *
+   * @return boolean
    */
   public function isValidValue($value, $field, $type) {
     if (!entity_property_verify_data_type($value, $type)) {
@@ -284,14 +355,24 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Change the given value to a date format.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessDate($value) {
     return strtotime($value);
   }
 
   /**
-   * {@inheritdoc}
+   * Wrap the value to a text format value.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessText($value) {
     return array(
@@ -300,14 +381,24 @@ abstract class AbstractEntityValidate implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Change the given value from a single value to a multiple value.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessList($value) {
     return array($value);
   }
 
   /**
-   * {@inheritdoc}
+   * Apply array_unique on the given value.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessUnique($value) {
     return array_unique($value);

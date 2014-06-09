@@ -1,6 +1,5 @@
-name = Node validator example
+name = Entity validator example
+description = "Example module for the Entity validator module."
 core = 7.x
 
 dependencies[] = entity_validator
-dependencies[] = date
-dependencies[] = date_popup

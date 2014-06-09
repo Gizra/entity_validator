@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Define the name fo the content type we will use during the example.
+ * @file
+ * Example module for the Entity validator module.
  */
-define('ENTITY_VALIDATOR_EXAMPLE_CONTENT_TYPE', 'validator_example_content_type');
 
 /**
  * Implements hook_ctools_plugin_directory().
@@ -14,33 +14,3 @@ function entity_validator_example_ctools_plugin_directory($module, $plugin) {
   }
 }
 
-/**
- * Implements hook_menu().
- */
-function entity_validator_example_menu() {
-  $items = array();
-
-  $items['entity_validator_example/example'] = array(
-    'title' => 'example',
-    'page callback' => 'entity_validator_example_example',
-    'access callback' => TRUE,
-  );
-
-  return $items;
-}
-
-/**
- * Page callback; This validate will fail on purpose.
- */
-function entity_validator_example_example() {
-  $validator = entity_validator_load_validator('node', 'article')
-    ->addField('title', '')
-    ->addField('field_date', '6/25/1989');
-
-  try {
-    $validator->validate();
-  } catch (Exception $e) {
-    drupal_set_message($e->getMessage(), 'error');
-  }
-  return '';
-}
