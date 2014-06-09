@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Progrmatically validate entities.
+ * Programmatically validate entities.
  */
 
 /**
@@ -11,11 +11,28 @@
 function entity_validator_ctools_plugin_type() {
   $plugins['validator'] = array(
     'classes' => array('class'),
+    'process' => 'entity_validator_plugin_process',
   );
+  $plugins['validator']['child plugins'] = TRUE;
 
   return $plugins;
 }
 
+/**
+ * Add defaults values to the validator plugins.
+ *
+ * Properties for the "validator" plugin type:
+ * - name: Set the name based on the entity type and bundle.
+ * - description: The description of the plugin. Defaults to empty string.
+ * - options: Array of options needed for the plugin.
+ */
+function entity_validator_plugin_process(&$plugin, $info) {
+  $plugin += array(
+    'name' => $plugin['entity_type'] . ':' . $plugin['bundle'],
+    'description' => '',
+    'options' => array(),
+  );
+}
 /**
  * Include CTools plugins and get all entity validator plugins.
  *

@@ -1,5 +1,5 @@
 name = Entity validator
-description = Progrmatically validate entities.
+description = "Programmatically validate entities."
 core = 7.x
 dependencies[] = entity
 

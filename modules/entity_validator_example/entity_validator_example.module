@@ -39,7 +39,8 @@ function entity_validator_example_example() {
 
   try {
     $validator->validate();
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
     drupal_set_message($e->getMessage(), 'error');
   }
   return '';
