@@ -26,7 +26,6 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $values = array(
       'type' => 'article',
     );
-
     $node = entity_create('node', $values);
 
     $handler = entity_validator_get_validator_handler('node', 'article');
@@ -41,8 +40,5 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     catch (\Exception $e) {
       $this->fail('Exception was not of type "\EntityValidatorException".');
     }
-
-
-
   }
 }
