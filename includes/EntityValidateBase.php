@@ -6,18 +6,6 @@
 abstract class EntityValidateBase implements EntityValidateInterface {
 
   /**
-   * Constructs a EntityValidateBase object.
-   *
-   * @param array $plugin
-   *   Plugin definition.
-   */
-  public function __construct($plugin) {
-    $this->plugin = $plugin;
-    $this->entityType = $plugin['entity_type'];
-    $this->bundle = $plugin['bundle'];
-  }
-
-  /**
    * The entity type.
    *
    * @var string
@@ -44,6 +32,18 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * @var Array
    */
   protected $errors = array();
+
+  /**
+   * Constructs a EntityValidateBase object.
+   *
+   * @param array $plugin
+   *   Plugin definition.
+   */
+  public function __construct($plugin) {
+    $this->plugin = $plugin;
+    $this->entityType = $plugin['entity_type'];
+    $this->bundle = $plugin['bundle'];
+  }
 
   /**
    * {@inheritdoc}
