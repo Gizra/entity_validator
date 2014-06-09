@@ -129,7 +129,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate() {
+  public function validate($entity) {
     $fields_info = $this->getFieldsInfo();
 
     // Collect the fields callbacks.
@@ -164,13 +164,13 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
     }
 
-    // Display the error.
+    // Throwing exception with the errors.
     if (!empty($this->errors)) {
       $params = array(
         '@errors' => implode(", ", $this->errors),
       );
 
-      throw new Exception(t('The validation process failed: @errors', $params));
+      throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
     }
 
     return TRUE;
@@ -184,7 +184,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify the field is not empty.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isNotEmpty($value, $field) {
     if (empty($value)) {
@@ -197,7 +204,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Check if the field is a text field.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isText($value, $field) {
     if (!is_string($value)) {
@@ -213,7 +227,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Check if the field is numeric field.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isNumeric($value, $field) {
     if (!is_int($value)) {
@@ -229,7 +250,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify the field is a list AKA array.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isList($value, $field) {
     if (!is_array($value)) {
@@ -245,7 +273,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify if the field present only a year.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isYear($value, $field) {
     if (!is_numeric($value) || (is_numeric($value) && $value > 9999)) {
@@ -261,7 +296,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Verify the given integer is a unix timestamp format integer.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   *
+   * @return boolean
    */
   public function isUnixTimeStamp($value, $field) {
     if (is_string($value)) {
@@ -282,7 +324,18 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Special validate callback: usually all the validator have two arguments,
+   * value and field. This validate method check the value of the field using
+   * the entity API module.
+   *
+   * @param $value
+   *  The value of the field.
+   * @param $field
+   *  The field name.
+   * @param $type
+   *  The type of the field.
+   *
+   * @return boolean
    */
   public function isValidValue($value, $field, $type) {
     if (!entity_property_verify_data_type($value, $type)) {
@@ -296,14 +349,24 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Change the given value to a date format.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessDate($value) {
     return strtotime($value);
   }
 
   /**
-   * {@inheritdoc}
+   * Wrap the value to a text format value.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessText($value) {
     return array(
@@ -312,14 +375,24 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Change the given value from a single value to a multiple value.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessList($value) {
     return array($value);
   }
 
   /**
-   * {@inheritdoc}
+   * Apply array_unique on the given value.
+   *
+   * @param $value
+   *  The value we need to change.
+   *
+   * @return mixed
    */
   public function preprocessUnique($value) {
     return array_unique($value);

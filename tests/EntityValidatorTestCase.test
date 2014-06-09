@@ -16,7 +16,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('entity_validator');
+    parent::setUp('entity_validator', 'entity_validator_example');
   }
 
   /**
