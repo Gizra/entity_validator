@@ -2,7 +2,7 @@
 
 /**
  * @file
- * node_validator.module
+ * Progrmatically validate entities.
  */
 
 /**
@@ -17,41 +17,45 @@ function entity_validator_ctools_plugin_type() {
 }
 
 /**
- * Include CTools plugins and get all node validator plugins.
+ * Include CTools plugins and get all entity validator plugins.
  *
  * @return array
- *   All plugins relate to node validator.
+ *   All plugins relate to entity validator.
  */
-function entity_validator_plugins() {
+function entity_validator_get_validator_plugins() {
   ctools_include('plugins');
   return ctools_get_plugins('entity_validator', 'validator');
 }
 
 /**
- * Load validator.
+ * Include CTools plugins and get the specified entity validator plugin.
+ *
+ * @param string $plugin_name
+ *   If provided this function only returns the selected plugin.
+ *
+ * @return array
+ *   The selected plugin for entity validator.
+ */
+function entity_validator_get_validator_plugin($plugin_name) {
+  ctools_include('plugins');
+  return ctools_get_plugins('entity_validator', 'validator', $plugin_name);
+}
+
+/**
+ * Return the validation handler based on entity type and bundle.
  *
  * @param $entity_type
  *  The entity type.
  * @param $bundle
  *  The bundle name.
  *
- * @return AbstractEntityValidate
+ * @return AbstractEntityValidate | NULL
+ *  The handler object if found, or NULL.
  */
-function entity_validator_load_validator($entity_type, $bundle) {
-  $plugins = entity_validator_plugins();
-
-  foreach ($plugins as $plugin) {
-    if ($entity_type == $plugin['entity_type'] && $bundle == $plugin['bundle']) {
-      $file = $plugin['path'] . '/' . $plugin['class'] . '.php';
-
-      if (file_exists($file)) {
-        require_once $file;
-      }
-
-      /** @var AbstractEntityValidate $validator */
-      $validator = new $plugin['class'];
-
-      return $validator->setBundle($bundle);
-    }
-  }
+function entity_validator_get_validator_handler($entity_type, $bundle) {
+  $plugin_name = $entity_type . ':' . $bundle;
+  $plugin = entity_validator_get_validator_plugin($plugin_name);
+  $class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class');
+  $handler = new $class($plugin);
+  return $handler;
 }

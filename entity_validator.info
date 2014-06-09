@@ -1,6 +1,6 @@
-name = Node validator
+name = Entity validator
+description = Progrmatically validate entities.
 core = 7.x
-dependencies[] = node
 dependencies[] = entity
 
 files[] = includes/EntityValidateInterface.php
