@@ -28,7 +28,6 @@ function entity_validator_ctools_plugin_type() {
  */
 function entity_validator_plugin_process(&$plugin, $info) {
   $plugin += array(
-    'name' => $plugin['entity_type'] . ':' . $plugin['bundle'],
     'description' => '',
     'options' => array(),
   );
@@ -70,7 +69,7 @@ function entity_validator_get_validator_plugin($plugin_name) {
  *  The handler object if found, or NULL.
  */
 function entity_validator_get_validator_handler($entity_type, $bundle) {
-  $plugin_name = $entity_type . ':' . $bundle;
+  $plugin_name = $entity_type . '__' . $bundle;
   $plugin = entity_validator_get_validator_plugin($plugin_name);
   $class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class');
   $handler = new $class($plugin);

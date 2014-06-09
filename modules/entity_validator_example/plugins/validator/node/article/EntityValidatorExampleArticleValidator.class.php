@@ -5,7 +5,7 @@
  * Contains EntityValidatorExampleArticleValidator.
  */
 
-class EntityValidatorExampleArticleValidator extends NodeValidate {
+class EntityValidatorExampleArticleValidator extends EntityValidateBase {
 
   /**
    * Overrides NodeValidate::getFieldsInfo().
