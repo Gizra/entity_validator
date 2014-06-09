@@ -65,7 +65,7 @@ function entity_validator_get_validator_plugin($plugin_name) {
  * @param $bundle
  *  The bundle name.
  *
- * @return AbstractEntityValidate | NULL
+ * @return EntityValidateBase | NULL
  *  The handler object if found, or NULL.
  */
 function entity_validator_get_validator_handler($entity_type, $bundle) {

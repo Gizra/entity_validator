@@ -72,7 +72,7 @@ interface EntityValidateInterface {
   public function setFields($fields);
 
   /**
-   * Set field validation and morphers.
+   * Set field validate and preprocess methods.
    *
    * @return Array.
    */
@@ -80,8 +80,13 @@ interface EntityValidateInterface {
 
   /**
    * Initialize the validate process.
+   *
+   * @param $entity
+   *  The entity we need to validate.
+   * 
+   * @throws EntityValidatorException
    */
-  public function validate();
+  public function validate($entity);
 
   /**
    * Set error.
@@ -94,132 +99,4 @@ interface EntityValidateInterface {
    *  of the error.
    */
   public function setError($message);
-
-  /**
-   * Verify the field is not empty.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isNotEmpty($value, $field);
-
-  /**
-   * Check if the field is a text field.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isText($value, $field);
-
-  /**
-   * Check if the field is numeric field.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isNumeric($value, $field);
-
-  /**
-   * Verify the field is a list AKA array.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isList($value, $field);
-
-  /**
-   * Verify if the field present only a year.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isYear($value, $field);
-
-  /**
-   * Verify the given integer is a unix timestamp format integer.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isUnixTimeStamp($value, $field);
-
-  /**
-   * Special validate callback: usually all the validator have two arguments,
-   * value and field. This validate method check the value of the field using
-   * the entity API module.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   * @param $type
-   *  The type of the field.
-   *
-   * @return boolean
-   */
-  public function isValidValue($value, $field, $type);
-
-  /**
-   * Change the given value to a date format.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessDate($value);
-
-  /**
-   * Wrap the value to a text format value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessText($value);
-
-  /**
-   * Change the given value from a single value to a multiple value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessList($value);
-
-  /**
-   * Apply array_unique on the given value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessUnique($value);
 }
