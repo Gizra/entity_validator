@@ -131,35 +131,41 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    */
   public function validate($entity) {
     $fields_info = $this->getFieldsInfo();
+    $wrapper = entity_metadata_wrapper($this->entityType, $entity);
 
     // Collect the fields callbacks.
-    if ($fields_info) {
-      foreach ($fields_info as $field => $info) {
-        if (!empty($info['preprocess'])) {
-          $info['preprocess'] = array_unique($info['preprocess']);
-          foreach ($info['preprocess'] as $preprocess) {
-            $this->fields[$field] = call_user_func_array($preprocess, array($this->fields[$field], $field));
+    foreach ($fields_info as $field => $info) {
+      if (!empty($info['preprocess'])) {
+        $info['preprocess'] = array_unique($info['preprocess']);
+        foreach ($info['preprocess'] as $preprocess) {
+          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+
+          if ($wrapper->__isset($field)) {
+            // Setting the fields value with the wrapper.
+            $wrapper->{$field}->set(call_user_func_array($preprocess, array($value, $field)));
           }
         }
+      }
 
-        // Loading default value of the fields and the instance.
-        $field_info = field_info_field($field);
-        $field_type_info = field_info_field_types($field_info['type']);
-        $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
+      // Loading default value of the fields and the instance.
+      $field_info = field_info_field($field);
+      $field_type_info = field_info_field_types($field_info['type']);
+      $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
 
-        if ($instance_info['required']) {
-          $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
-        }
+      if ($instance_info['required']) {
+        $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
+      }
 
-        if (isset($field_type_info['property_type'])) {
-          $this->isValidValue($this->fields[$field], $field, $field_type_info['property_type']);
-        }
+      if (isset($field_type_info['property_type'])) {
+        $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+        $this->isValidValue($value, $field, $field_type_info['property_type']);
+      }
 
-        if (!empty($info['validators'])) {
-          $info['validators'] = array_unique($info['validators']);
-          foreach ($info['validators'] as $validator) {
-            call_user_func_array($validator, array($this->fields[$field], $field));
-          }
+      if (!empty($info['validators'])) {
+        $info['validators'] = array_unique($info['validators']);
+        foreach ($info['validators'] as $validator) {
+          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+          call_user_func_array($validator, array($value, $field));
         }
       }
     }

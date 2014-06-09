@@ -13,15 +13,21 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function getFieldsInfo() {
     $fields = parent::getFieldsInfo();
 
-    $fields['field_date'] = array(
+    $fields['uid'] = array(
       'validators' => array(
-        array($this, 'isUnixTimeStamp'),
-      ),
-      'preprocess' => array(
-        array($this, 'preprocessDate'),
+        array($this, 'validateAuthenticatedUser'),
       ),
     );
 
     return $fields;
+  }
+
+  /**
+   * Validating the node author belong to authenticated user.
+   */
+  public function validateAuthenticatedUser($value, $field) {
+    if (!$value) {
+      $this->setError(t('The author of the node must be authenticated user'));
+    }
   }
 }

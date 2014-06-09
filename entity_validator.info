@@ -14,3 +14,4 @@ files[] = exceptions/EntityValidatorException.php
 
 ; Tests
 files[] = tests/EntityValidatorTestCase.test
+files[] = tests/EntityValidatorTestErrorsCase.test

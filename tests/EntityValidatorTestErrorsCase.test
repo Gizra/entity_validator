@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains EntityValidatorTestCase.
+ * Contains EntityValidatorTestErrorsCase.
  */
 
-class EntityValidatorTestCase extends DrupalWebTestCase {
+class EntityValidatorTestErrorsCase extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Validate exception',
-      'description' => 'Test the validation on an entity.',
+      'name' => 'Validate errors',
+      'description' => 'Test the errors which will be thrown to the user.',
       'group' => 'Entity validator',
     );
   }
@@ -34,10 +34,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       $handler->validate($node);
     }
     catch (\EntityValidatorException $e) {
-      $this->pass('Exception "\EntityValidatorException" was thrown.');
-    }
-    catch (\Exception $e) {
-      $this->fail('Exception was not of type "\EntityValidatorException".');
+      debug($e->getMessage());
+      $text = "The validation process failed: The field title can&#039;t be empty, The author of the node must be authenticated user";
+      $this->assertEqual($e->getMessage(), $text, 'The expected message was not thrown to the user.');
     }
   }
 }
