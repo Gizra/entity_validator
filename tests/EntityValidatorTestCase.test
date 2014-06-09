@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Contains EntityValidatorTestCase.
+ */
+
+class EntityValidatorTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Validate',
+      'description' => 'Test the validation on an entity.',
+      'group' => 'Entity validator',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('entity_validator');
+  }
+
+  /**
+   * Test the validation on an entity.
+   */
+  function testValidate() {
+    $values = array(
+      'type' => 'article',
+    );
+
+    $node = entity_create('node', $values);
+
+    $handler = entity_validator_get_validator_handler('node', 'article');
+
+    try {
+      $handler->validate($node);
+      $this->fail('No exception was thrown.');
+    }
+    catch (\EntityValidatorException $e) {
+      $this->pass('Exception "\EntityValidatorException" was thrown.');
+    }
+    catch (\Exception $e) {
+      $this->fail('Exception was not of type "\EntityValidatorException".');
+    }
+
+
+
+  }
+}

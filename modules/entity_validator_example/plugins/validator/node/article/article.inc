@@ -2,8 +2,8 @@
 
 $plugin = array(
   'label' => t('Article'),
-  'description' => t('Validating the article content type.'),
-  'bundle' => 'article',
+  'description' => t('Validate the article content type.'),
   'entity_type' => 'node',
-  'class' => 'NodeValidatorExampleArticleValidator',
+  'bundle' => 'article',
+  'class' => 'EntityValidatorExampleArticleValidator',
 );

@@ -10,3 +10,6 @@ files[] = includes/CommentValidate.php
 files[] = includes/TaxonomyTermValidate.php
 files[] = includes/UserValidate.php
 files[] = includes/VocabualryValidate.php
+
+; Tests
+files[] = tests/EntityValidatorTestCase.test
