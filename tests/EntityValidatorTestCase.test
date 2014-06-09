@@ -25,7 +25,6 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
   function testValidate() {
   $values = array(
     'type' => 'article',
-    // ... Add all the fields
   );
   $node = entity_create('node', $values);
   $handler = entity_validator_get_validator_handler('node', 'article');
