@@ -1,7 +1,9 @@
 name = Entity validator
 description = "Programmatically validate entities."
 core = 7.x
+dependencies[] = ctools
 dependencies[] = entity
+
 
 ; Handlers
 files[] = includes/EntityValidateBase.php
