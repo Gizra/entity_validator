@@ -27,7 +27,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    */
   public function validateAuthenticatedUser($field_name, $value) {
     if (!$value->uid) {
-      $this->setError(t('The author of the node must be authenticated user'));
+      $this->setError($field_name, 'The author of the node must be authenticated user');
     }
   }
 }

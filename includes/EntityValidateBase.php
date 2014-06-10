@@ -144,17 +144,26 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
     }
 
-    // Throwing exception with the errors.
-    if (!$silent && !empty($this->errors)) {
-      $params = array(
-        '@errors' => implode(", ", $this->errors),
-      );
+    if (empty($this->errors)) {
+      return TRUE;
+    }
 
-      throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
+    $errors = array();
+
+    foreach ($this->errors as $field_name => $error) {
+      $errors[$field_name] = t($error['message'], $error['params']);
     }
-    else {
-      return $this->errors;
+
+    // Throwing exception with the errors.
+    if ($silent) {
+      return $errors;
     }
+
+    $params = array(
+      '@errors' => implode(", ", $errors),
+    );
+
+    throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
   }
 
   /**
@@ -185,8 +194,8 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setError($message) {
-    $this->errors[] = $message;
+  public function setError($field, $message, $params = array()) {
+    $this->errors[$field] = array('message' => $message, 'params' => $params);
   }
 
   /**
@@ -205,7 +214,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@field' => $field_name,
       );
 
-      $this->setError(t("The field @field can't be empty", $params));
+      $this->setError($field_name, "The field @field can't be empty", $params);
     }
   }
 
@@ -230,14 +239,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@field' => $field_name,
       );
 
-      $error = array(
-        'field_foo' => array(
-          'message' => 'The value %value is invalid for the field %field-label',
-          'params' => $params,
-        ),
-      );
-
-      $this->setError(t('The value %value is invalid for the field %field-label', $params));
+      $this->setError($field_name, 'The value @value is invalid for the field @field', $params);
     }
   }
 }
