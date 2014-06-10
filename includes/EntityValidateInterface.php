@@ -91,23 +91,6 @@ interface EntityValidateInterface {
   public function validate($entity, $silent = FALSE);
 
   /**
-   * Preprocess the field. This is useful when we need to alter a field before
-   * the validation process.
-   *
-   * @param $field_name
-   *  The field machine name.
-   * @param $callbacks
-   *  List of callbacks.
-   * @param EntityMetadataWrapper $wrapper
-   *  The entity wrapped with the entity metadata wrapper.
-   *  @see entity_metadata_wrapper().
-   * @param $state
-   *  Define if we need to set the value or validate the field. Allowed values:
-   *  preprocess, validate. Default is preprocess.
-   */
-  public function iterateFields($field_name, $callbacks, EntityMetadataWrapper $wrapper, $state = 'preprocess');
-
-  /**
    * Set error.
    *
    * @param $message

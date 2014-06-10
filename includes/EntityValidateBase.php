@@ -140,7 +140,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     foreach ($fields_info as $field_name => $info) {
 
       if (!empty($info['preprocess'])) {
-        $this->iterateFields($field_name, array_unique($info['preprocess']), $wrapper);
+        $this->invokeMethods($wrapper->{$field_name}, array_unique($info['preprocess']), TRUE);
       }
 
       // Loading default value of the fields and the instance.
@@ -158,7 +158,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if (!empty($info['validators'])) {
-        $this->iterateFields($field_name, array_unique($info['validators']), $wrapper, 'validate');
+        $this->invokeMethods($wrapper->{$field_name}, array_unique($info['validators']));
       }
     }
 
@@ -181,19 +181,28 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
 
   /**
-   * {@inheritdoc}
+   * Preprocess the field. This is useful when we need to alter a field before
+   * the validation process.
+   *
+   * @param $field_name
+   *  The field machine name.
+   * @param $callbacks
+   *  List of callbacks.
+   * @param EntityMetadataWrapper $wrapper
+   *  The entity wrapped with the entity metadata wrapper.
+   *  @see entity_metadata_wrapper().
+   * @param $state
+   *  Define if we need to set the value or validate the field. Allowed values:
+   *  preprocess, validate. Default is preprocess.
    */
-  protected function iterateFields($field_name, $callbacks, EntityMetadataWrapper $wrapper, $state = 'preprocess') {
-    foreach ($callbacks as $callback) {
-      $value = isset($wrapper->{$field_name}) ? $wrapper->{$field_name}->value() : $wrapper->value()->{$field_name};
+  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
+    foreach ($methods as $method) {
+      $value = $property_wrapper->value();
 
-      if (isset($wrapper->{$field_name})) {
-        $value = $this->{$callback}($value, $field_name);
-
-        if ($state == 'preprocess') {
-          // Setting the fields value with the wrapper.
-          $wrapper->{$field_name}->set($value);
-        }
+      $new_value = $this->{$method}($value);
+      if ($assign_value && $new_value != $value) {
+        // Setting the fields value with the wrapper.
+        $property_wrapper->set($value);
       }
     }
   }
@@ -226,126 +235,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * Check if the field is a text field.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isText($value, $field) {
-    if (!is_string($value)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not a string', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Check if the field is numeric field.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isNumeric($value, $field) {
-    if (!is_int($value)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not an integer', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Verify the field is a list AKA array.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isList($value, $field) {
-    if (!is_array($value)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not an array', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Verify if the field present only a year.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isYear($value, $field) {
-    if (!is_numeric($value) || (is_numeric($value) && $value > 9999)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not an year', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Verify the given integer is a unix timestamp format integer.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isUnixTimeStamp($value, $field) {
-    if (is_string($value)) {
-      $this->setError(t("The time stamp can't be a string"));
-      return;
-    }
-
-    if (!($value <= PHP_INT_MAX) && ($value >= ~PHP_INT_MAX)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError(t('The give value(@value) is not a time stamp format since the given value is out of range.', $params));
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * Special validate callback: usually all the validator have two arguments,
    * value and field. This validate method check the value of the field using
    * the entity API module.
@@ -375,55 +264,5 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
       $this->setError(t('The value %value is invalid for the field %field-label', $params));
     }
-  }
-
-  /**
-   * Change the given value to a date format.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessDate($value) {
-    return strtotime($value);
-  }
-
-  /**
-   * Wrap the value to a text format value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessText($value) {
-    return array(
-      'value' => $value,
-    );
-  }
-
-  /**
-   * Change the given value from a single value to a multiple value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessList($value) {
-    return array($value);
-  }
-
-  /**
-   * Apply array_unique on the given value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessUnique($value) {
-    return array_unique($value);
   }
 }
