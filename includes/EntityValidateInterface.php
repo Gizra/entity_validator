@@ -73,11 +73,22 @@ interface EntityValidateInterface {
    * @param $field
    *  The name of the field.
    * @param $message
-   *  Set the error message.
+   *  Set the error message without wrapping the text with t().
+   * @param $params
+   *  Optional. The parameters for the t() function.
    *
    * @throws Exception
    *  When setting the error level to 1 exception will be thrown with the value
    *  of the error.
+   *
+   * @code
+   *  $params = array(
+   *    '@value' => 'foo',
+   *    '@field' => 'date',
+   *  );
+   *  $this->setError('field_date', 'The value @value is invalid for the field @field', $params);
+   *  $this->setError('title', 'The node must have a title');
+   * @endcode
    */
-  public function setError($field, $message);
+  public function setError($field, $message, $params = '');
 }
