@@ -118,7 +118,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     if (!empty($keys['label'])) {
       $fields_info[$keys['label']] = array(
         'validators' => array(
-          array($this, 'isNotEmpty'),
+          'isNotEmpty',
         ),
       );
     }
@@ -149,12 +149,12 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
 
       if ($instance_info['required']) {
-        $fields_info[$field_name]['validators'][] = array($this, 'isNotEmpty');
+        $fields_info[$field_name]['validators'][] = 'isNotEmpty';
       }
 
       if (isset($field_type_info['property_type'])) {
         $value = isset($wrapper->{$field_name}) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
-        $this->isValidValue($value, $field_name, $field_type_info['property_type']);
+        $this->isValidValue($field_name, $value, $field_type_info['property_type']);
       }
 
       if (!empty($info['validators'])) {
@@ -179,27 +179,23 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
   }
 
-
   /**
    * Preprocess the field. This is useful when we need to alter a field before
    * the validation process.
    *
-   * @param $field_name
-   *  The field machine name.
-   * @param $callbacks
-   *  List of callbacks.
-   * @param EntityMetadataWrapper $wrapper
-   *  The entity wrapped with the entity metadata wrapper.
-   *  @see entity_metadata_wrapper().
-   * @param $state
-   *  Define if we need to set the value or validate the field. Allowed values:
-   *  preprocess, validate. Default is preprocess.
+   * @param \EntityMetadataWrapper $property_wrapper
+   *  The property wrapper.
+   * @param array $methods
+   *  Array of callbacks.
+   * @param bool $assign_value
+   *  Determine if we need to assign the from the callback to the field.
    */
   protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
     foreach ($methods as $method) {
       $value = $property_wrapper->value();
 
-      $new_value = $this->{$method}($value);
+      $info = $property_wrapper->info();
+      $new_value = $this->{$method}($value, $info['name']);
       if ($assign_value && $new_value != $value) {
         // Setting the fields value with the wrapper.
         $property_wrapper->set($value);
@@ -217,14 +213,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * Verify the field is not empty.
    *
-   * @param $value
-   *  The value of the field.
    * @param $field
    *  The field name.
+   * @param $value
+   *  The value of the field.
    *
    * @return boolean
    */
-  public function isNotEmpty($value, $field) {
+  public function isNotEmpty($field, $value) {
     if (empty($value)) {
       $params = array(
         '@field' => $field,
@@ -239,16 +235,16 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * value and field. This validate method check the value of the field using
    * the entity API module.
    *
-   * @param $value
-   *  The value of the field.
    * @param $field
    *  The field name.
+   * @param $value
+   *  The value of the field.
    * @param $type
    *  The type of the field.
    *
    * @return boolean
    */
-  public function isValidValue($value, $field, $type) {
+  public function isValidValue($field, $value, $type) {
     if (!entity_property_verify_data_type($value, $type)) {
       $params = array(
         '@value' => (String) $value,

@@ -13,7 +13,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function getFieldsInfo() {
     $fields = parent::getFieldsInfo();
 
-    $fields['uid'] = array(
+    $fields['author'] = array(
       'validators' => array(
         'validateAuthenticatedUser',
       ),
@@ -25,8 +25,8 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   /**
    * Validating the node author belong to authenticated user.
    */
-  public function validateAuthenticatedUser($value, $field) {
-    if (!$value) {
+  public function validateAuthenticatedUser($value) {
+    if (!$value->uid) {
       $this->setError(t('The author of the node must be authenticated user'));
     }
   }
