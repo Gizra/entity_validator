@@ -195,7 +195,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $value = $property_wrapper->value();
 
       $info = $property_wrapper->info();
-      $new_value = $this->{$method}($value, $info['name']);
+      $new_value = $this->{$method}($info['name'], $value);
       if ($assign_value && $new_value != $value) {
         // Setting the fields value with the wrapper.
         $property_wrapper->set($value);
