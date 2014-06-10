@@ -43,36 +43,12 @@ interface EntityValidateInterface {
   public function getEntityType();
 
   /**
-   * Adding the field the validation process.
-   *
-   * @param $name
-   *  The machine name of the field.
-   * @param $value
-   *  The value of the field.
-   *
-   * @return $this
+   * Set the field validate and preprocess methods.
    */
-  public function addField($name, $value);
+  public function fieldsInfo();
 
   /**
-   * Retrieve fields.
-   *
-   * @return Array
-   */
-  public function getFields();
-
-  /**
-   * Set the fields.
-   *
-   * @param $fields
-   *  The desire structure.
-   *
-   * @return $this.
-   */
-  public function setFields($fields);
-
-  /**
-   * Set field validate and preprocess methods.
+   * Get the field validate and preprocess methods.
    *
    * @return Array.
    */
@@ -85,6 +61,7 @@ interface EntityValidateInterface {
    *  The entity we need to validate.
    * @param $silent
    *  Determine if we throw the exception or return array with the errors.
+   *  Defaults to FALSE.
    * 
    * @throws EntityValidatorException
    */
