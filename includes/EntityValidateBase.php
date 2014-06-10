@@ -230,13 +230,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@field' => $field_name,
       );
 
-      $error = array(
-        'field_foo' => array(
-          'message' => 'The value %value is invalid for the field %field-label',
-          'params' => $params,
-        ),
-      );
-
       $this->setError(t('The value %value is invalid for the field %field-label', $params));
     }
   }
