@@ -129,7 +129,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate($entity, $silent) {
+  public function validate($entity, $silent = FALSE) {
     if (!$fields_info = $this->getFieldsInfo()) {
       return TRUE;
     }
@@ -138,17 +138,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     // Collect the fields callbacks.
     foreach ($fields_info as $field_name => $info) {
-      if (empty($info['preprocess'])) {
-        continue;
-      }
-      $info['preprocess'] = array_unique($info['preprocess']);
-      foreach ($info['preprocess'] as $preprocess) {
-        $value = isset($wrapper->{$field_name}) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
 
-        if (isset($wrapper->{$field_name})) {
-          // Setting the fields value with the wrapper.
-          $wrapper->{$field_name}->set(call_user_func_array($preprocess, array($value, $field_name)));
-        }
+      if (!empty($info['preprocess'])) {
+        $this->iterateFields($field_name, array_unique($info['preprocess']), $wrapper);
       }
 
       // Loading default value of the fields and the instance.
@@ -161,16 +153,12 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if (isset($field_type_info['property_type'])) {
-        $value = $wrapper->__isset($field_name) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
+        $value = isset($wrapper->{$field_name}) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
         $this->isValidValue($value, $field_name, $field_type_info['property_type']);
       }
 
       if (!empty($info['validators'])) {
-        $info['validators'] = array_unique($info['validators']);
-        foreach ($info['validators'] as $validator) {
-          $value = $wrapper->__isset($field_name) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
-          call_user_func_array($validator, array($value, $field_name));
-        }
+        $this->iterateFields($field_name, array_unique($info['validators']), $wrapper, 'validate');
       }
     }
 
@@ -189,6 +177,25 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $handler->getErrors();
     }
 
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function iterateFields($field_name, $callbacks, EntityMetadataWrapper $wrapper, $state = 'preprocess') {
+    foreach ($callbacks as $callback) {
+      $value = isset($wrapper->{$field_name}) ? $wrapper->{$field_name}->value() : $wrapper->value()->{$field_name};
+
+      if (isset($wrapper->{$field_name})) {
+        $value = $this->{$callback}($value, $field_name);
+
+        if ($state == 'preprocess') {
+          // Setting the fields value with the wrapper.
+          $wrapper->{$field_name}->set($value);
+        }
+      }
+    }
   }
 
   /**
