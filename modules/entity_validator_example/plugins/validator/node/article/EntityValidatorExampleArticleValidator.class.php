@@ -15,7 +15,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
 
     $fields['uid'] = array(
       'validators' => array(
-        array($this, 'validateAuthenticatedUser'),
+        'validateAuthenticatedUser',
       ),
     );
 

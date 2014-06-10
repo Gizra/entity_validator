@@ -129,43 +129,47 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate($entity) {
-    $fields_info = $this->getFieldsInfo();
+  public function validate($entity, $silent) {
+    if (!$fields_info = $this->getFieldsInfo()) {
+      return TRUE;
+    }
+
     $wrapper = entity_metadata_wrapper($this->entityType, $entity);
 
     // Collect the fields callbacks.
-    foreach ($fields_info as $field => $info) {
-      if (!empty($info['preprocess'])) {
-        $info['preprocess'] = array_unique($info['preprocess']);
-        foreach ($info['preprocess'] as $preprocess) {
-          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
+    foreach ($fields_info as $field_name => $info) {
+      if (empty($info['preprocess'])) {
+        continue;
+      }
+      $info['preprocess'] = array_unique($info['preprocess']);
+      foreach ($info['preprocess'] as $preprocess) {
+        $value = isset($wrapper->{$field_name}) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
 
-          if ($wrapper->__isset($field)) {
-            // Setting the fields value with the wrapper.
-            $wrapper->{$field}->set(call_user_func_array($preprocess, array($value, $field)));
-          }
+        if (isset($wrapper->{$field_name})) {
+          // Setting the fields value with the wrapper.
+          $wrapper->{$field_name}->set(call_user_func_array($preprocess, array($value, $field_name)));
         }
       }
 
       // Loading default value of the fields and the instance.
-      $field_info = field_info_field($field);
+      $field_info = field_info_field($field_name);
       $field_type_info = field_info_field_types($field_info['type']);
-      $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
+      $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
 
       if ($instance_info['required']) {
-        $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
+        $fields_info[$field_name]['validators'][] = array($this, 'isNotEmpty');
       }
 
       if (isset($field_type_info['property_type'])) {
-        $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
-        $this->isValidValue($value, $field, $field_type_info['property_type']);
+        $value = $wrapper->__isset($field_name) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
+        $this->isValidValue($value, $field_name, $field_type_info['property_type']);
       }
 
       if (!empty($info['validators'])) {
         $info['validators'] = array_unique($info['validators']);
         foreach ($info['validators'] as $validator) {
-          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
-          call_user_func_array($validator, array($value, $field));
+          $value = $wrapper->__isset($field_name) ? $wrapper->{$field_name}->value() : $entity->{$field_name};
+          call_user_func_array($validator, array($value, $field_name));
         }
       }
     }
@@ -180,6 +184,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     }
 
     return TRUE;
+
+    if (!$handler->validate($entity, TRUE)) {
+      $handler->getErrors();
+    }
+
   }
 
   /**
@@ -346,8 +355,15 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   public function isValidValue($value, $field, $type) {
     if (!entity_property_verify_data_type($value, $type)) {
       $params = array(
-        '%value' => (String) $value,
-        '%field-label' => $field,
+        '@value' => (String) $value,
+        '@field' => $field,
+      );
+
+      $error = array(
+        'field_foo' => array(
+          'message' => 'The value %value is invalid for the field %field-label',
+          'params' => $params,
+        ),
       );
 
       $this->setError(t('The value %value is invalid for the field %field-label', $params));
