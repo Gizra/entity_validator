@@ -34,7 +34,6 @@ class EntityValidatorTestErrorsCase extends DrupalWebTestCase {
       $handler->validate($node);
     }
     catch (\EntityValidatorException $e) {
-      debug($e->getMessage());
       $text = "The validation process failed: The field title can&#039;t be empty, The author of the node must be authenticated user";
       $this->assertEqual($e->getMessage(), $text, 'The expected message was not thrown to the user.');
     }
