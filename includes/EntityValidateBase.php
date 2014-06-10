@@ -185,8 +185,8 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setError($message) {
-    $this->errors[] = $message;
+  public function setError($field, $message) {
+    $this->errors[$field] = $message;
   }
 
   /**
@@ -205,7 +205,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@field' => $field_name,
       );
 
-      $this->setError(t("The field @field can't be empty", $params));
+      $this->setError($field_name, "The field @field can't be empty", $params);
     }
   }
 

@@ -70,6 +70,8 @@ interface EntityValidateInterface {
   /**
    * Set error.
    *
+   * @param $field
+   *  The name of the field.
    * @param $message
    *  Set the error message.
    *
@@ -77,5 +79,5 @@ interface EntityValidateInterface {
    *  When setting the error level to 1 exception will be thrown with the value
    *  of the error.
    */
-  public function setError($message);
+  public function setError($field, $message);
 }
