@@ -144,23 +144,26 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
     }
 
-    // Throwing exception with the errors.
-    if (!$silent && !empty($this->errors)) {
-      $params = array(
-        '@errors' => implode(", ", $this->errors),
-      );
-
-      throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
+    if (empty($this->errors)) {
+      return TRUE;
     }
-    else {
-      $errors = array();
 
-      foreach ($this->errors as $field_name => $error) {
-        $errors[$field_name] = t($error['message'], $error['params']);
-      }
+    $errors = array();
 
+    foreach ($this->errors as $field_name => $error) {
+      $errors[$field_name] = t($error['message'], $error['params']);
+    }
+
+    // Throwing exception with the errors.
+    if ($silent) {
       return $errors;
     }
+
+    $params = array(
+      '@errors' => implode(", ", $errors),
+    );
+
+    throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
   }
 
   /**
@@ -191,7 +194,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setError($field, $message, $params = '') {
+  public function setError($field, $message, $params = array()) {
     $this->errors[$field] = array('message' => $message, 'params' => $params);
   }
 
