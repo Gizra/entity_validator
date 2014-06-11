@@ -156,11 +156,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     // Throwing exception with the errors.
     if ($silent) {
-      return $errors;
+      return $errors_list;
     }
 
     $params = array(
-      '@errors' => implode(", ", $errors),
+      '@errors' => implode(", ", $errors_list),
     );
 
     throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
