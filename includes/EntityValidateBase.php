@@ -100,7 +100,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function getFieldsInfo() {
-    $fields = $this->fieldsInfo();
+    $fields = $this->setfieldsInfo();
 
     foreach ($fields as $field_name => $info) {
       // Loading default value of the fields and the instance.
