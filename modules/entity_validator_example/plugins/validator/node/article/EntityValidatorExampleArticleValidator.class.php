@@ -13,10 +13,11 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function setFieldsInfo() {
     $fields = parent::setFieldsInfo();
 
-    $fields['author'] = array(
+    $fields['uid'] = array(
       'validators' => array(
         'validateAuthenticatedUser',
       ),
+      'property' => 'author',
     );
 
     return $fields;

@@ -126,9 +126,10 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     // Collect the fields callbacks.
     foreach ($fields_info as $field_name => $info) {
+      $property = isset($info['property']) ? $info['property'] : $field_name;
 
       if (!empty($info['preprocess'])) {
-        $this->invokeMethods($wrapper->{$field_name}, $info['preprocess'], TRUE);
+        $this->invokeMethods($wrapper->{$property}, $info['preprocess'], TRUE);
       }
 
       // Loading default value of the fields and the instance.
@@ -136,11 +137,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $field_type_info = field_info_field_types($field_info['type']);
 
       if (isset($field_type_info['property_type'])) {
-        $this->isValidValue($field_name, $wrapper->{$field_name}->value(), $field_type_info['property_type']);
+        $this->isValidValue($field_name, $wrapper->{$property}->value(), $field_type_info['property_type']);
       }
 
       if (!empty($info['validators'])) {
-        $this->invokeMethods($wrapper->{$field_name}, $info['validators']);
+        $this->invokeMethods($wrapper->{$property}, $info['validators']);
       }
     }
 
