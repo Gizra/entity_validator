@@ -45,7 +45,7 @@ interface EntityValidateInterface {
   /**
    * Set the field validate and preprocess methods.
    */
-  public function fieldsInfo();
+  public function setFieldsInfo();
 
   /**
    * Get the field validate and preprocess methods.

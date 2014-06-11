@@ -10,8 +10,8 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   /**
    * Overrides NodeValidate::getFieldsInfo().
    */
-  public function fieldsInfo() {
-    $fields = parent::fieldsInfo();
+  public function setFieldsInfo() {
+    $fields = parent::setFieldsInfo();
 
     $fields['author'] = array(
       'validators' => array(

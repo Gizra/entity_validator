@@ -79,7 +79,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function fieldsInfo() {
+  public function setFieldsInfo() {
     $fields_info = array();
     $entity_info = entity_get_info($this->entityType);
     $keys = $entity_info['entity keys'];
