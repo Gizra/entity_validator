@@ -43,36 +43,12 @@ interface EntityValidateInterface {
   public function getEntityType();
 
   /**
-   * Adding the field the validation process.
-   *
-   * @param $name
-   *  The machine name of the field.
-   * @param $value
-   *  The value of the field.
-   *
-   * @return $this
+   * Set the field validate and preprocess methods.
    */
-  public function addField($name, $value);
+  public function setFieldsInfo();
 
   /**
-   * Retrieve fields.
-   *
-   * @return Array
-   */
-  public function getFields();
-
-  /**
-   * Set the fields.
-   *
-   * @param $fields
-   *  The desire structure.
-   *
-   * @return $this.
-   */
-  public function setFields($fields);
-
-  /**
-   * Set field validate and preprocess methods.
+   * Get the field validate and preprocess methods.
    *
    * @return Array.
    */
@@ -83,20 +59,44 @@ interface EntityValidateInterface {
    *
    * @param $entity
    *  The entity we need to validate.
+   * @param $silent
+   *  Determine if we throw the exception or return array with the errors.
+   *  Defaults to FALSE.
    * 
    * @throws EntityValidatorException
    */
-  public function validate($entity);
+  public function validate($entity, $silent = FALSE);
 
   /**
    * Set error.
    *
+   * @param $field_name
+   *  The name of the field.
    * @param $message
-   *  Set the error message.
+   *  Set the error message without wrapping the text with t().
+   * @param $params
+   *  Optional. The parameters for the t() function.
    *
    * @throws Exception
    *  When setting the error level to 1 exception will be thrown with the value
    *  of the error.
+   *
+   * @code
+   *  $params = array(
+   *    '@value' => 'foo',
+   *    '@field' => 'date',
+   *  );
+   *  $this->setError('field_date', 'The value @value is invalid for the field @field', $params);
+   *  $this->setError('title', 'The node must have a title');
+   * @endcode
    */
-  public function setError($message);
+  public function setError($field_name, $message, $params = '');
+
+  /**
+   * Retrieve the errors.
+   *
+   * @return Array
+   *  Return the errors which occurred during the validation process.
+   */
+  public function getErrors();
 }

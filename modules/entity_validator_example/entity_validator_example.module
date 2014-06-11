@@ -13,4 +13,3 @@ function entity_validator_example_ctools_plugin_directory($module, $plugin) {
     return 'plugins/' . $plugin;
   }
 }
-

@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Contains EntityValidatorTestSilenceCase.
+ */
+
+class EntityValidatorTestSilenceCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Validate errors silent mode',
+      'description' => 'Test the errors can be return into a variable and not thrown.',
+      'group' => 'Entity validator',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('entity_validator', 'entity_validator_example');
+  }
+
+  /**
+   * Test the validation on an entity.
+   */
+  function testValidate() {
+    $values = array(
+      'type' => 'article',
+      'uid' => 0,
+    );
+    $node = entity_create('node', $values);
+    $handler = entity_validator_get_validator_handler('node', 'article');
+
+    $errors = $handler->validate($node, TRUE);
+    $expected_errors = array (
+      'title' => 'The field title can\'t be empty',
+      'author' => 'The author of the node must be authenticated user',
+    );
+    $this->assertEqual($errors, $expected_errors, 'The silent mode returned the expected array.');
+  }
+}

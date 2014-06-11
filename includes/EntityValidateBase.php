@@ -79,37 +79,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function addField($field, $value) {
-    $fields = explode(":", $field);
-
-    if (count($fields) == 2) {
-      $this->fields[$fields[0]][$fields[1]] = $value;
-    }
-    else {
-      $this->fields[$field] = $value;
-    }
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFields() {
-    return $this->fields;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setFields($fields) {
-    $this->fields = $fields;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldsInfo() {
+  public function setFieldsInfo() {
     $fields_info = array();
     $entity_info = entity_get_info($this->entityType);
     $keys = $entity_info['entity keys'];
@@ -118,7 +88,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     if (!empty($keys['label'])) {
       $fields_info[$keys['label']] = array(
         'validators' => array(
-          array($this, 'isNotEmpty'),
+          'isNotEmpty',
         ),
       );
     }
@@ -129,204 +99,131 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate($entity) {
-    $fields_info = $this->getFieldsInfo();
-    $wrapper = entity_metadata_wrapper($this->entityType, $entity);
+  public function getFieldsInfo() {
+    $fields = $this->setfieldsInfo();
 
-    // Collect the fields callbacks.
-    foreach ($fields_info as $field => $info) {
-      if (!empty($info['preprocess'])) {
-        $info['preprocess'] = array_unique($info['preprocess']);
-        foreach ($info['preprocess'] as $preprocess) {
-          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
-
-          if ($wrapper->__isset($field)) {
-            // Setting the fields value with the wrapper.
-            $wrapper->{$field}->set(call_user_func_array($preprocess, array($value, $field)));
-          }
-        }
-      }
-
+    foreach ($fields as $field_name => $info) {
       // Loading default value of the fields and the instance.
-      $field_info = field_info_field($field);
-      $field_type_info = field_info_field_types($field_info['type']);
-      $instance_info = field_info_instance($this->entityType, $field, $this->bundle);
+      $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
 
       if ($instance_info['required']) {
-        $fields_info[$field]['validators'][] = array($this, 'isNotEmpty');
-      }
-
-      if (isset($field_type_info['property_type'])) {
-        $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
-        $this->isValidValue($value, $field, $field_type_info['property_type']);
-      }
-
-      if (!empty($info['validators'])) {
-        $info['validators'] = array_unique($info['validators']);
-        foreach ($info['validators'] as $validator) {
-          $value = $wrapper->__isset($field) ? $wrapper->{$field}->value() : $entity->{$field};
-          call_user_func_array($validator, array($value, $field));
-        }
+        $fields[$field_name]['validators'][] = 'isNotEmpty';
       }
     }
 
-    // Throwing exception with the errors.
-    if (!empty($this->errors)) {
-      $params = array(
-        '@errors' => implode(", ", $this->errors),
-      );
-
-      throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
-    }
-
-    return TRUE;
+    return $fields;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setError($message) {
-    $this->errors[] = $message;
+  public function validate($entity, $silent = FALSE) {
+    if (!$fields_info = $this->getFieldsInfo()) {
+      return TRUE;
+    }
+
+    $wrapper = entity_metadata_wrapper($this->entityType, $entity);
+
+    // Collect the fields callbacks.
+    foreach ($fields_info as $field_name => $info) {
+      $property = isset($info['property']) ? $info['property'] : $field_name;
+
+      if (!empty($info['preprocess'])) {
+        $this->invokeMethods($wrapper->{$property}, $info['preprocess'], TRUE);
+      }
+
+      // Loading default value of the fields and the instance.
+      $field_info = field_info_field($field_name);
+      $field_type_info = field_info_field_types($field_info['type']);
+
+      if (isset($field_type_info['property_type'])) {
+        $this->isValidValue($field_name, $wrapper->{$property}->value(), $field_type_info['property_type']);
+      }
+
+      if (!empty($info['validators'])) {
+        $this->invokeMethods($wrapper->{$property}, $info['validators']);
+      }
+    }
+
+    if (!$errors = $this->getErrors()) {
+      return TRUE;
+    }
+
+    $errors_list = array();
+
+    foreach ($errors as $field_name => $error) {
+      $errors_list[$field_name] = t($error['message'], $error['params']);
+    }
+
+    // Throwing exception with the errors.
+    if ($silent) {
+      return $errors_list;
+    }
+
+    $params = array(
+      '@errors' => implode(", ", $errors_list),
+    );
+
+    throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
+  }
+
+  /**
+   * Preprocess the field. This is useful when we need to alter a field before
+   * the validation process.
+   *
+   * @param \EntityMetadataWrapper $property_wrapper
+   *  The property wrapper.
+   * @param array $methods
+   *  Array of methods.
+   * @param bool $assign_value
+   *  Determine if we need to assign the from the callback to the field. Default
+   *  to FALSE.
+   */
+  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
+    foreach ($methods as $method) {
+      $value = $property_wrapper->value();
+
+      $info = $property_wrapper->info();
+      $new_value = $this->{$method}($info['name'], $value);
+      if ($assign_value && $new_value != $value) {
+        // Setting the fields value with the wrapper.
+        $property_wrapper->set($value);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setError($field_name, $message, $params = array()) {
+    $this->errors[$field_name] = array('message' => $message, 'params' => $params);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getErrors() {
+    return $this->errors;
   }
 
   /**
    * Verify the field is not empty.
    *
+   * @param $field_name
+   *  The field name.
    * @param $value
    *  The value of the field.
-   * @param $field
-   *  The field name.
    *
    * @return boolean
    */
-  public function isNotEmpty($value, $field) {
+  public function isNotEmpty($field_name, $value) {
     if (empty($value)) {
       $params = array(
-        '@field' => $field,
+        '@field' => $field_name,
       );
 
-      $this->setError(t("The field @field can't be empty", $params));
+      $this->setError($field_name, "The field @field can't be empty", $params);
     }
-  }
-
-  /**
-   * Check if the field is a text field.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isText($value, $field) {
-    if (!is_string($value)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not a string', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Check if the field is numeric field.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isNumeric($value, $field) {
-    if (!is_int($value)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not an integer', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Verify the field is a list AKA array.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isList($value, $field) {
-    if (!is_array($value)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not an array', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Verify if the field present only a year.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isYear($value, $field) {
-    if (!is_numeric($value) || (is_numeric($value) && $value > 9999)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError('The given value(@value) is not an year', $params);
-      return;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Verify the given integer is a unix timestamp format integer.
-   *
-   * @param $value
-   *  The value of the field.
-   * @param $field
-   *  The field name.
-   *
-   * @return boolean
-   */
-  public function isUnixTimeStamp($value, $field) {
-    if (is_string($value)) {
-      $this->setError(t("The time stamp can't be a string"));
-      return;
-    }
-
-    if (!($value <= PHP_INT_MAX) && ($value >= ~PHP_INT_MAX)) {
-      $params = array(
-        '@value' => $value,
-      );
-
-      $this->setError(t('The give value(@value) is not a time stamp format since the given value is out of range.', $params));
-      return;
-    }
-
-    return TRUE;
   }
 
   /**
@@ -334,73 +231,23 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * value and field. This validate method check the value of the field using
    * the entity API module.
    *
+   * @param $field_name
+   *  The field name.
    * @param $value
    *  The value of the field.
-   * @param $field
-   *  The field name.
    * @param $type
    *  The type of the field.
    *
    * @return boolean
    */
-  public function isValidValue($value, $field, $type) {
+  public function isValidValue($field_name, $value, $type) {
     if (!entity_property_verify_data_type($value, $type)) {
       $params = array(
-        '%value' => (String) $value,
-        '%field-label' => $field,
+        '@value' => (String) $value,
+        '@field' => $field_name,
       );
 
-      $this->setError(t('The value %value is invalid for the field %field-label', $params));
+      $this->setError($field_name, 'The value @value is invalid for the field @field', $params);
     }
-  }
-
-  /**
-   * Change the given value to a date format.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessDate($value) {
-    return strtotime($value);
-  }
-
-  /**
-   * Wrap the value to a text format value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessText($value) {
-    return array(
-      'value' => $value,
-    );
-  }
-
-  /**
-   * Change the given value from a single value to a multiple value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessList($value) {
-    return array($value);
-  }
-
-  /**
-   * Apply array_unique on the given value.
-   *
-   * @param $value
-   *  The value we need to change.
-   *
-   * @return mixed
-   */
-  public function preprocessUnique($value) {
-    return array_unique($value);
   }
 }
