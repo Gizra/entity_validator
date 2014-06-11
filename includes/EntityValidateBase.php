@@ -144,14 +144,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
     }
 
-    if (empty($this->errors)) {
+    if (!$errors = $this->getErrors()) {
       return TRUE;
     }
 
-    $errors = array();
+    $errors_list = array();
 
-    foreach ($this->errors as $field_name => $error) {
-      $errors[$field_name] = t($error['message'], $error['params']);
+    foreach ($errors as $field_name => $error) {
+      $errors_list[$field_name] = t($error['message'], $error['params']);
     }
 
     // Throwing exception with the errors.
@@ -194,8 +194,15 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setError($field, $message, $params = array()) {
-    $this->errors[$field] = array('message' => $message, 'params' => $params);
+  public function setError($field_name, $message, $params = array()) {
+    $this->errors[$field_name] = array('message' => $message, 'params' => $params);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getErrors() {
+    return $this->errors;
   }
 
   /**

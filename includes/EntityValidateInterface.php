@@ -70,7 +70,7 @@ interface EntityValidateInterface {
   /**
    * Set error.
    *
-   * @param $field
+   * @param $field_name
    *  The name of the field.
    * @param $message
    *  Set the error message without wrapping the text with t().
@@ -90,5 +90,13 @@ interface EntityValidateInterface {
    *  $this->setError('title', 'The node must have a title');
    * @endcode
    */
-  public function setError($field, $message, $params = '');
+  public function setError($field_name, $message, $params = '');
+
+  /**
+   * Retrieve the errors.
+   *
+   * @return Array
+   *  Return the errors which occurred during the validation process.
+   */
+  public function getErrors();
 }

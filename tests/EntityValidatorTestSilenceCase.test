@@ -30,16 +30,11 @@ class EntityValidatorTestSilenceCase extends DrupalWebTestCase {
     $node = entity_create('node', $values);
     $handler = entity_validator_get_validator_handler('node', 'article');
 
-    try {
-      $errors = $handler->validate($node, TRUE);
-      $expected_errors = array (
-        'title' => 'The field title can\'t be empty',
-        'author' => 'The author of the node must be authenticated user',
-      );
-      $this->assertEqual($errors, $expected_errors, 'The silent mode returned the expected array.');
-    }
-    catch (\EntityValidatorException $e) {
-      $this->fail('Exception was thrown when the silent mode was on.');
-    }
+    $errors = $handler->validate($node, TRUE);
+    $expected_errors = array (
+      'title' => 'The field title can\'t be empty',
+      'author' => 'The author of the node must be authenticated user',
+    );
+    $this->assertEqual($errors, $expected_errors, 'The silent mode returned the expected array.');
   }
 }
