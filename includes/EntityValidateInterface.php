@@ -96,11 +96,12 @@ interface EntityValidateInterface {
    * Retrieve the errors.
    *
    * @param $squash
-   *   If TRUE, the message and params would be squashed to a single message.
-   *   Defaults to false, which will keep the "message" and "params" separated.
+   *   If TRUE, the message and params would be squashed to a single message. If
+   *   FALSE it will keep the "message" and "params" separated. Defaults to
+   *   TRUE.
    *
    * @return Array
    *  Return the errors which occurred during the validation process.
    */
-  public function getErrors($squash = FALSE);
+  public function getErrors($squash = TRUE);
 }

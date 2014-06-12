@@ -154,7 +154,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return FALSE;
     }
 
-    $params = array('@errors' => implode("\n\r", $this->getErrors(TRUE)));
+    $params = array('@errors' => implode("\n\r", $errors));
     throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
   }
 
