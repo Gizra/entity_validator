@@ -104,4 +104,9 @@ interface EntityValidateInterface {
    *  Return the errors which occurred during the validation process.
    */
   public function getErrors($squash = TRUE);
+
+  /**
+   * Clear the errors array.
+   */
+  public function clearErrors();
 }
