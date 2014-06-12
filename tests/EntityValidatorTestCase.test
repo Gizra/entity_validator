@@ -48,11 +48,15 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $expected_result = array (
       'title' => array(
         'message' => 'The field title cannot be empty.',
-        'params' => array(),
+        'params' => array(
+          '@field' => 'title',
+        ),
       ),
       'author' => array(
         'The author of the node must be authenticated user.',
-        'params' => array(),
+        'params' => array(
+          '@field' => 'uid',
+        ),
       ),
     );
     // $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
