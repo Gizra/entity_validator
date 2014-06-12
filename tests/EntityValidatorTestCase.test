@@ -39,5 +39,30 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     catch (\Exception $e) {
       $this->fail('Exception was not of type "\EntityValidatorException".');
     }
+
+    // Silent mode.
+    $result = $handler->validate($node, TRUE);
+    $this->assertFalse($result, 'Validate in silent mode did not throw an exception.');
+
+    $result = $handler->getErrors(FALSE);
+    $expected_result = array (
+      'title' => array(
+        array(
+          'message' => 'The field @field cannot be empty.',
+          'params' => array(
+            '@field' => 'title',
+          ),
+        ),
+      ),
+      'author' => array(
+        array(
+          'message' => 'The author of the content must be an authenticated user.',
+          'params' => array(
+            '@field' => 'author',
+          ),
+        ),
+      ),
+    );
+    $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
   }
 }

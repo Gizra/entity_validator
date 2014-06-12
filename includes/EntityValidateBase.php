@@ -118,6 +118,8 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function validate($entity, $silent = FALSE) {
+    // Clear any previous error messages.
+    $this->clearErrors();
     if (!$fields_info = $this->getFieldsInfo()) {
       return TRUE;
     }
@@ -149,22 +151,13 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return TRUE;
     }
 
-    $errors_list = array();
-
-    foreach ($errors as $field_name => $error) {
-      $errors_list[$field_name] = t($error['message'], $error['params']);
-    }
-
-    // Throwing exception with the errors.
     if ($silent) {
-      return $errors_list;
+      // Don't throw an error, and just indicate validation failed.
+      return FALSE;
     }
 
-    $params = array(
-      '@errors' => implode(", ", $errors_list),
-    );
-
-    throw new \EntityValidatorException(t('The validation process failed: @errors', $params));
+    $params = array('@errors' => $errors);
+    throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
   }
 
   /**
@@ -196,14 +189,34 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function setError($field_name, $message, $params = array()) {
-    $this->errors[$field_name] = array('message' => $message, 'params' => $params);
+    $params['@field'] = $field_name;
+    $this->errors[$field_name][] = array('message' => $message, 'params' => $params);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getErrors() {
-    return $this->errors;
+  public function getErrors($squash = TRUE) {
+    if (!$squash) {
+      return $this->errors;
+    }
+
+    $return = array();
+    foreach ($this->errors as $errors) {
+      foreach ($errors as $error) {
+        $error += array('params' => array());
+        $return[] = format_string($error['message'], $error['params']);
+      }
+    }
+
+    return implode("\n\r", $return);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearErrors() {
+    $this->errors = array();
   }
 
   /**
@@ -222,7 +235,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@field' => $field_name,
       );
 
-      $this->setError($field_name, "The field @field can't be empty", $params);
+      $this->setError($field_name, 'The field @field cannot be empty.', $params);
     }
   }
 
@@ -247,7 +260,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@field' => $field_name,
       );
 
-      $this->setError($field_name, 'The value @value is invalid for the field @field', $params);
+      $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
     }
   }
 }

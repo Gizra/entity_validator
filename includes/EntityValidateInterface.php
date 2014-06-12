@@ -62,7 +62,7 @@ interface EntityValidateInterface {
    * @param $silent
    *  Determine if we throw the exception or return array with the errors.
    *  Defaults to FALSE.
-   * 
+   *
    * @throws EntityValidatorException
    */
   public function validate($entity, $silent = FALSE);
@@ -95,8 +95,18 @@ interface EntityValidateInterface {
   /**
    * Retrieve the errors.
    *
+   * @param $squash
+   *   If TRUE, the message and params would be squashed to a single message. If
+   *   FALSE it will keep the "message" and "params" separated. Defaults to
+   *   TRUE.
+   *
    * @return Array
    *  Return the errors which occurred during the validation process.
    */
-  public function getErrors();
+  public function getErrors($squash = TRUE);
+
+  /**
+   * Clear the errors array.
+   */
+  public function clearErrors();
 }
