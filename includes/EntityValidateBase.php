@@ -93,15 +93,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       );
     }
 
-    // Add isNotEmpty validator for every required field.
+    // Add all fields.
     foreach (field_info_instances($this->entityType, $this->bundle) as $field_name => $field_info) {
-      if ($field_info->required) {
-        $fields_info[$field_name] = array(
-          'validators' => array(
-            'isNotEmpty',
-          ),
-        );
-      }
+      $fields_info[$field_name] = array();
     }
 
     return $fields_info;
@@ -164,7 +158,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     if ($silent) {
       // Don't throw an error, and just indicate validation failed.
-      return FALSE;
+      return $errors;
     }
 
     $params = array('@errors' => $errors);
@@ -246,6 +240,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * @return boolean
    */
   public function isNotEmpty($field_name, $value) {
+    if (is_array($value) && isset($value['value'])) {
+      $value = $value['value'];
+    }
     if (empty($value)) {
       $params = array(
         '@field' => $field_name,
