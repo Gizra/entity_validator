@@ -208,12 +208,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
     }
 
-    if ($return) {
-      return $return;
-    }
-    else {
-      return FALSE;
-    }
+    return implode("\n\r", $return);
   }
 
   /**
