@@ -152,7 +152,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     if ($silent) {
       // Don't throw an error, and just indicate validation failed.
-      return $errors;
+      return FALSE;
     }
 
     $params = array('@errors' => $errors);
@@ -209,7 +209,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     }
 
     if ($return) {
-      return implode("\n\r", $return);
+      return $return;
     }
     else {
       return FALSE;
