@@ -105,8 +105,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     // Add all fields.
     foreach (field_info_instances($this->entityType, $this->bundle) as $field_name => $info) {
       $field_info = field_info_field($field_name);
-      $type = $field_info['type'];
-      if ($info['required'] && $type !== 'entityreference') {
+      if ($info['required']) {
         $fields[$field_name]['validators'][] = 'isNotEmpty';
       }
     }
