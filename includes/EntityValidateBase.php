@@ -93,11 +93,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       );
     }
 
-    // Add all fields.
-    foreach (field_info_instances($this->entityType, $this->bundle) as $field_name => $field_info) {
-      $fields_info[$field_name] = array();
-    }
-
     return $fields_info;
   }
 
@@ -107,11 +102,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   public function getFieldsInfo() {
     $fields = $this->setfieldsInfo();
 
-    foreach ($fields as $field_name => $info) {
-      // Loading default value of the fields and the instance.
-      $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
-
-      if ($instance_info['required']) {
+    // Add all fields.
+    foreach (field_info_instances($this->entityType, $this->bundle) as $field_name => $info) {
+      $field_info = field_info_field($field_name);
+      $type = $field_info['type'];
+      if ($info['required'] && $type !== 'entityreference') {
         $fields[$field_name]['validators'][] = 'isNotEmpty';
       }
     }
