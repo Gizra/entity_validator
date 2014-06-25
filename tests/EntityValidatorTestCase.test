@@ -28,7 +28,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       'uid' => 0,
     );
     $node = entity_create('node', $values);
-    $handler = entity_validator_get_validator_handler('node', 'article');
+    $handler = entity_validator_load_entity_validator('node', $node);
 
     try {
       $handler->validate($node);

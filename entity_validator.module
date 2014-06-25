@@ -75,3 +75,24 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
   $handler = new $class($plugin);
   return $handler;
 }
+
+
+/**
+ * Loading a validator a given entity.
+ *
+ * @param $entity_type
+ *  The entity type i.e: node, user
+ * @param $entity
+ *  The entity object.
+ *
+ * @return EntityValidateInterface | NULL
+ */
+function entity_validator_load_entity_validator($entity_type, $entity) {
+  list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+
+  if (!$validator = entity_validator_get_validator_handler($entity_type, $bundle)) {
+    return NULL;
+  }
+
+  return $validator;
+}
