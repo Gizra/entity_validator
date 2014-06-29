@@ -47,10 +47,10 @@ function entity_validator_get_validator_plugins() {
  * Include CTools plugins and get the specified entity validator plugin.
  *
  * @param string $plugin_name
- *   If provided this function only returns the selected plugin.
+ *  If provided this function only returns the selected plugin.
  *
  * @return array
- *   The selected plugin for entity validator.
+ *  The selected plugin for entity validator.
  */
 function entity_validator_get_validator_plugin($plugin_name) {
   ctools_include('plugins');
@@ -79,7 +79,6 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
   $handler = new $class($plugin);
   return $handler;
 }
-
 
 /**
  * Loading a validator a given entity.
