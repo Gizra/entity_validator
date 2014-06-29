@@ -87,20 +87,36 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
  *  The entity type i.e: node, user
  * @param $entity
  *  The entity object.
- * @param $silent
- *  Determine if the validation should be silent or not. Default to false.
+ * @param $return
+ *  Determine the validation process state according to the next values:
+ *    - NULL: the validation process will be done with throwing exception.
+ *    - silent: return the state of the validation in boolean format.
+ *    - errors: Return the errors from the handlers in a raw format i.e without
+ *              replacing the field names.
+ *    - squash: Return the errors from the handlers in a squashed format i.e
+ *              replacing the field names.
  *  @see EntityValidateBase::validate();
  *
  * @throws EntityValidatorException
  * @return Boolean
  *  TRUE/FALSE will be returned if $silent set to TRUE.
  */
-function entity_validator_validate_entity($entity_type, $entity, $silent = FALSE) {
+function entity_validator_validate_entity($entity_type, $entity, $return = NULL) {
   list(,, $bundle) = entity_extract_ids($entity_type, $entity);
 
   if (!$validator = entity_validator_get_validator_handler($entity_type, $bundle)) {
     return NULL;
   }
 
-  return $validator->validate($entity, $silent);
+  if (!$return) {
+    $validator->validate($entity);
+  }
+  elseif ($return == 'silent') {
+    return $validator->validate($entity, TRUE);
+  }
+  else {
+    $validator->validate($entity, TRUE);
+
+    return $validator->getErrors($return == 'squash');
+  }
 }
