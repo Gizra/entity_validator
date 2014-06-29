@@ -88,15 +88,20 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
  *  The entity type i.e: node, user
  * @param $entity
  *  The entity object.
+ * @param $silent
+ *  Determine if the validation should be silent or not. Default to false.
+ *  @see EntityValidateBase::validate();
  *
- * @return EntityValidateInterface | NULL
+ * @throws EntityValidatorException
+ * @return Boolean
+ *  TRUE/FALSE will be returned if $silent set to TRUE.
  */
-function entity_validator_load_entity_validator($entity_type, $entity) {
+function entity_validator_validate_entity($entity_type, $entity, $silent = FALSE) {
   list(,, $bundle) = entity_extract_ids($entity_type, $entity);
 
   if (!$validator = entity_validator_get_validator_handler($entity_type, $bundle)) {
     return NULL;
   }
 
-  return $validator;
+  return $validator->validate($entity, $silent);
 }
