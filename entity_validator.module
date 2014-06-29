@@ -71,7 +71,11 @@ function entity_validator_get_validator_plugin($plugin_name) {
 function entity_validator_get_validator_handler($entity_type, $bundle) {
   $plugin_name = $entity_type . '__' . $bundle;
   $plugin = entity_validator_get_validator_plugin($plugin_name);
-  $class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class');
+
+  if (!$class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class')) {
+    return NULL;
+  }
+
   $handler = new $class($plugin);
   return $handler;
 }
