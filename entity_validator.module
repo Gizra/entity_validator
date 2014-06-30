@@ -81,42 +81,37 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
 }
 
 /**
- * Loading a validator a given entity.
+ * Validate an entity.
  *
  * @param $entity_type
- *  The entity type i.e: node, user
+ *  The entity type.
  * @param $entity
  *  The entity object.
- * @param $return
- *  Determine the validation process state according to the next values:
- *    - NULL: the validation process will be done with throwing exception.
- *    - silent: return the state of the validation in boolean format.
- *    - errors: Return the errors from the handlers in a raw format i.e without
- *              replacing the field names.
- *    - squash: Return the errors from the handlers in a squashed format i.e
- *              replacing the field names.
- *  @see EntityValidateBase::validate();
+ * @param $silent
+ *  Determine if we throw the exception or return array with the errors.
+ *  Defaults to FALSE.
+ * @param $squash
+ *   If TRUE, the message and params would be squashed to a single message. If
+ *   FALSE it will keep the "message" and "params" separated. Defaults to
+ *   TRUE.
  *
  * @throws EntityValidatorException
- * @return Boolean
- *  TRUE/FALSE will be returned if $silent set to TRUE.
+ * @return Boolean | NULL
+ *  TRUE or FALSE will be returned if the handler exists and entity is valid,
+ *  otherwise NULL.
  */
-function entity_validator_validate_entity($entity_type, $entity, $return = NULL) {
+function entity_validator_validate_entity($entity_type, $entity, $silent = FALSE, $squash = TRUE) {
   list(,, $bundle) = entity_extract_ids($entity_type, $entity);
 
-  if (!$validator = entity_validator_get_validator_handler($entity_type, $bundle)) {
-    return NULL;
+  if (!$handler = entity_validator_get_validator_handler($entity_type, $bundle)) {
+    // No handler found.
+    return;
   }
 
-  if (!$return) {
-    $validator->validate($entity);
+  if (!$silent) {
+    return $handler->validate($entity);
   }
-  elseif ($return == 'silent') {
-    return $validator->validate($entity, TRUE);
-  }
-  else {
-    $validator->validate($entity, TRUE);
 
-    return $validator->getErrors($return == 'squash');
-  }
+  $handler->validate($entity, TRUE);
+  return $handler->getErrors($squash);
 }
