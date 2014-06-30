@@ -9,7 +9,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Validate exception',
+      'name' => 'Validate entity',
       'description' => 'Test the validation on an entity.',
       'group' => 'Entity validator',
     );
@@ -53,12 +53,10 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
             '@field' => 'title',
           ),
         ),
-      ),
-      'author' => array(
         array(
-          'message' => 'The author of the content must be an authenticated user.',
+          'message' => 'The @field should be at least 3 characters long.',
           'params' => array(
-            '@field' => 'author',
+            '@field' => 'title',
           ),
         ),
       ),
