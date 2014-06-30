@@ -13,22 +13,17 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function setFieldsInfo() {
     $fields = parent::setFieldsInfo();
 
-    $fields['uid'] = array(
-      'validators' => array(
-        'validateAuthenticatedUser',
-      ),
-      'property' => 'author',
-    );
+    $fields['title']['validators'][] = 'validateTitleText';
 
     return $fields;
   }
 
   /**
-   * Validating the node author belong to authenticated user.
+   * Validate the title is at least 3 characters long.
    */
-  public function validateAuthenticatedUser($field_name, $value) {
-    if (!$value->uid) {
-      $this->setError($field_name, 'The author of the content must be an authenticated user.');
+  public function validateTitleText($field_name, $value) {
+    if (strlen($value) < 3) {
+      $this->setError($field_name, 'The @field should be at least 3 characters long.');
     }
   }
 }
