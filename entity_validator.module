@@ -5,6 +5,46 @@
  * Programmatically validate entities.
  */
 
+
+/**
+ * Validate an entity.
+ *
+ * This is a wrapper function that should be called by other modules in order
+ * to validate entities created programmatically.
+ *
+ * @param $entity_type
+ *  The entity type.
+ * @param $entity
+ *  The entity object.
+ * @param $silent
+ *  Determine if we throw the exception or return array with the errors.
+ *  Defaults to FALSE.
+ * @param $squash
+ *   If TRUE, the message and params would be squashed to a single message. If
+ *   FALSE it will keep the "message" and "params" separated. Defaults to
+ *   TRUE.
+ *
+ * @throws EntityValidatorException
+ * @return Boolean | NULL
+ *  TRUE or FALSE will be returned if the handler exists and entity is valid,
+ *  otherwise NULL.
+ */
+function entity_validator_validate_entity($entity_type, $entity, $silent = FALSE, $squash = TRUE) {
+  list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+
+  if (!$handler = entity_validator_get_validator_handler($entity_type, $bundle)) {
+    // No handler found.
+    return;
+  }
+
+  if (!$silent) {
+    return $handler->validate($entity);
+  }
+
+  $handler->validate($entity, TRUE);
+  return $handler->getErrors($squash);
+}
+
 /**
  * Implements hook_ctools_plugin_type().
  */
@@ -78,40 +118,4 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
 
   $handler = new $class($plugin);
   return $handler;
-}
-
-/**
- * Validate an entity.
- *
- * @param $entity_type
- *  The entity type.
- * @param $entity
- *  The entity object.
- * @param $silent
- *  Determine if we throw the exception or return array with the errors.
- *  Defaults to FALSE.
- * @param $squash
- *   If TRUE, the message and params would be squashed to a single message. If
- *   FALSE it will keep the "message" and "params" separated. Defaults to
- *   TRUE.
- *
- * @throws EntityValidatorException
- * @return Boolean | NULL
- *  TRUE or FALSE will be returned if the handler exists and entity is valid,
- *  otherwise NULL.
- */
-function entity_validator_validate_entity($entity_type, $entity, $silent = FALSE, $squash = TRUE) {
-  list(,, $bundle) = entity_extract_ids($entity_type, $entity);
-
-  if (!$handler = entity_validator_get_validator_handler($entity_type, $bundle)) {
-    // No handler found.
-    return;
-  }
-
-  if (!$silent) {
-    return $handler->validate($entity);
-  }
-
-  $handler->validate($entity, TRUE);
-  return $handler->getErrors($squash);
 }
