@@ -28,10 +28,8 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       'uid' => 0,
     );
     $node = entity_create('node', $values);
-    $handler = entity_validator_get_validator_handler('node', 'article');
-
     try {
-      $handler->validate($node);
+      entity_validator_validate_entity('node', $node);
     }
     catch (\EntityValidatorException $e) {
       $this->pass('Exception "\EntityValidatorException" was thrown.');
@@ -41,9 +39,11 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     }
 
     // Silent mode.
-    $result = $handler->validate($node, TRUE);
+    $result = entity_validator_validate_entity('node', $node, TRUE);
     $this->assertFalse($result, 'Validate in silent mode did not throw an exception.');
 
+    $handler = entity_validator_get_validator_handler('node', 'article');
+    $handler->validate($node, TRUE);
     $result = $handler->getErrors(FALSE);
     $expected_result = array (
       'title' => array(
