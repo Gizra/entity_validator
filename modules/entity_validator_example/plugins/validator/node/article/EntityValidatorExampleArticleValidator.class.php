@@ -15,6 +15,8 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
 
     $fields['title']['validators'][] = 'validateTitleText';
 
+    $fields['body']['validators'][] = 'validateBodyText';
+
     return $fields;
   }
 
@@ -24,6 +26,15 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function validateTitleText($field_name, $value) {
     if (strlen($value) < 3) {
       $this->setError($field_name, 'The @field should be at least 3 characters long.');
+    }
+  }
+
+  /**
+   * Validate the description has the word "Gizra".
+   */
+  public function validateBodyText($field_name, $value) {
+    if (strpos($value, 'Gizra') === FALSE) {
+      $this->setError($field_name, 'The @field should have the word "Gizra".');
     }
   }
 }
