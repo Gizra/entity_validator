@@ -60,6 +60,21 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
+      'body' => array(
+        array(
+          'message' => 'The value @value is invalid for the field @field.',
+          'params' => array(
+            '@value' => '',
+            '@field' => 'body',
+          ),
+        ),
+        array(
+          'message' => 'The @field should have the word "Gizra".',
+          'params' => array (
+            '@field' => 'body',
+          ),
+        ),
+      ),
     );
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
   }
