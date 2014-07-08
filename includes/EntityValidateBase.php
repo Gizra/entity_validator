@@ -164,8 +164,10 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * Preprocess the field. This is useful when we need to alter a field before
    * the validation process.
    *
-   * @param \EntityMetadataWrapper $property_wrapper
-   *  The property wrapper.
+   * @param \EntityMetadataWrapper $wrapper
+   *  The wrapper object.
+   * @param string $property_name
+   *  The property name.
    * @param array $methods
    *  Array of methods.
    * @param bool $assign_value
