@@ -105,7 +105,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     foreach ($fields as $field_name => $info) {
       // Loading default value of the fields and the instance.
       $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
-
       if ($instance_info['required']) {
         $fields[$field_name]['validators'][] = 'isNotEmpty';
       }
@@ -261,6 +260,53 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       );
 
       $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+    }
+  }
+
+  /**
+   * Validate the field image: Check the image is the correct size.
+   */
+  public function validateImageField($field_name, $value) {
+    $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
+    $settings = $info['settings'];
+
+    $params = array(
+      '@width' => $value['width'],
+      '@height' => $value['height'],
+    );
+
+    if (!empty($settings['max_resolution'])) {
+      list($max_height, $max_width) = explode("x", $settings['max_resolution']);
+
+      $params += array(
+        '@max-width' => $max_width,
+        '@max-height' => $max_height,
+      );
+
+      if ($value['width'] > $max_width) {
+        $this->setError($field_name, 'The width of the image(@width) is bigger then the allowed size(@max-width)', $params);
+      }
+
+      if ($value['height'] > $max_height) {
+        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@max-height)', $params);
+      }
+    }
+
+    if (!empty($settings['min_resolution'])) {
+      list($min_height, $min_width) = explode("x", $settings['min_resolution']);
+
+      $params += array(
+        '@min-width' => $min_width,
+        '@min-height' => $min_height,
+      );
+
+      if ($value['width'] < $min_width) {
+        $this->setError($field_name, 'The width of the image(@width) is bigger then the allowed size(@min-width) ', $params);
+      }
+
+      if ($value['height'] < $min_height) {
+        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height) ', $params);
+      }
     }
   }
 }
