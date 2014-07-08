@@ -131,19 +131,19 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $property = isset($info['property']) ? $info['property'] : $field_name;
 
       if (!empty($info['preprocess'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['preprocess'], TRUE);
+        $this->invokeMethods($wrapper, $property, $info['preprocess'], TRUE);
       }
 
       // Loading default value of the fields and the instance.
       $field_info = field_info_field($field_name);
       $field_type_info = field_info_field_types($field_info['type']);
 
-      if (isset($field_type_info['property_type'])) {
+      if (isset($field_type_info['property_type']) && $wrapper->{$property}->value()) {
         $this->isValidValue($field_name, $wrapper->{$property}->value(), $field_type_info['property_type']);
       }
 
       if (!empty($info['validators'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['validators']);
+        $this->invokeMethods($wrapper, $property, $info['validators']);
       }
     }
 
@@ -172,12 +172,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *  Determine if we need to assign the from the callback to the field. Default
    *  to FALSE.
    */
-  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
+  protected function invokeMethods(EntityMetadataWrapper $wrapper, $property_name, array $methods, $assign_value = FALSE) {
     foreach ($methods as $method) {
-      $value = $property_wrapper->value();
+      $property_wrapper = $wrapper->{$property_name};
 
+      $value = $property_wrapper->value();
       $info = $property_wrapper->info();
-      $new_value = $this->{$method}($info['name'], $value);
+
+      $new_value = $this->{$method}($info['name'], $value, $wrapper);
       if ($assign_value && $new_value != $value) {
         // Setting the fields value with the wrapper.
         $property_wrapper->set($value);
