@@ -30,15 +30,6 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   }
 
   /**
-   * Verify the field is empty.
-   */
-  public function validateIsEmpty($field_name, $value) {
-    if (!empty($value)) {
-      $this->setError($field_name, 'The field @field need to be empty.');
-    }
-  }
-
-  /**
    * Validate the description has the word "Gizra".
    */
   public function validateBodyText($field_name, $value) {
