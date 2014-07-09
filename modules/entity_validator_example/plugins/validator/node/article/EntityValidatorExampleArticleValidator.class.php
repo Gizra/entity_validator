@@ -14,6 +14,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
     $fields = parent::setFieldsInfo();
 
     $fields['title']['validators'][] = 'validateTitleText';
+    $fields['body']['validators'][] = 'validateBodyText';
     $fields['field_image']['validators'][] = 'isNotEmpty';
 
     return $fields;
@@ -34,6 +35,15 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function validateIsEmpty($field_name, $value) {
     if (!empty($value)) {
       $this->setError($field_name, 'The field @field need to be empty.');
+    }
+  }
+
+  /**
+   * Validate the description has the word "Gizra".
+   */
+  public function validateBodyText($field_name, $value) {
+    if (empty($value['value']) || strpos($value['value'], 'Gizra') === FALSE) {
+      $this->setError($field_name, 'The @field should have the word "Gizra".');
     }
   }
 }
