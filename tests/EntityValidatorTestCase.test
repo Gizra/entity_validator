@@ -45,7 +45,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $this->assertFalse($result, 'Validate in silent mode did not throw an exception.');
 
     $result = $handler->getErrors(FALSE);
-    $expected_result = array (
+    $expected_result = array(
       'title' => array(
         array(
           'message' => 'The field @field cannot be empty.',
@@ -62,16 +62,17 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
       'body' => array(
         array(
-          'message' => 'The value @value is invalid for the field @field.',
-          'params' => array(
-            '@value' => '',
-            '@field' => 'body',
-          ),
-        ),
-        array(
           'message' => 'The @field should have the word "Gizra".',
           'params' => array (
             '@field' => 'body',
+          ),
+        ),
+      ),
+      'field_image' => array(
+        array(
+          'message' => 'The field @field cannot be empty.',
+          'params' => array (
+            '@field' => 'field_image',
           ),
         ),
       ),

@@ -137,7 +137,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $field_info = field_info_field($field_name);
       $field_type_info = field_info_field_types($field_info['type']);
 
-      if (isset($field_type_info['property_type'])) {
+      if (isset($field_type_info['property_type']) && $wrapper->{$property}->value()) {
         $this->isValidValue($field_name, $wrapper->{$property}->value(), $field_type_info['property_type']);
       }
 
