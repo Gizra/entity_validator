@@ -21,7 +21,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   /**
    * Validate the title is at least 3 characters long.
    */
-  public function validateTitleText($field_name, $value) {
+  public function validateTitleText($field_name, $value, $wrapper) {
     if (strlen($value) < 3) {
       $this->setError($field_name, 'The @field should be at least 3 characters long.');
     }
