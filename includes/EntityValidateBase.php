@@ -79,26 +79,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function _setFieldsInfo() {
-    $fields_info = array();
-    $entity_info = entity_get_info($this->entityType);
-    $keys = $entity_info['entity keys'];
-
-    // When the entity has a label key we need to verify it's not empty.
-    if (!empty($keys['label'])) {
-      $fields_info[$keys['label']] = array(
-        'validators' => array(
-          'isNotEmpty',
-        ),
-      );
-    }
-
-    return $fields_info;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getFieldsInfo() {
     $fields = array();
     $entity_info = entity_get_info($this->entityType);
