@@ -79,7 +79,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setFieldsInfo() {
+  public function _setFieldsInfo() {
     $fields_info = array();
     $entity_info = entity_get_info($this->entityType);
     $keys = $entity_info['entity keys'];
@@ -100,13 +100,32 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * {@inheritdoc}
    */
   public function getFieldsInfo() {
-    $fields = $this->setfieldsInfo();
+    $fields = array();
+    $entity_info = entity_get_info($this->entityType);
+    $keys = $entity_info['entity keys'];
 
-    foreach ($fields as $field_name => $info) {
-      // Loading default value of the fields and the instance.
-      $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
+    // When the entity has a label key we need to verify it's not empty.
+    if (!empty($keys['label'])) {
+      $fields[$keys['label']] = array(
+        'validators' => array(
+          'isNotEmpty',
+        ),
+      );
+    }
+
+    $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
+
+    foreach ($instances_info as $instance_info) {
+
       if ($instance_info['required']) {
-        $fields[$field_name]['validators'][] = 'isNotEmpty';
+        // Loading default value of the fields and the instance.
+        $fields[$instance_info['field_name']]['validators'][] = 'isNotEmpty';
+      }
+
+      $field_info = field_info_field($instance_info['field_name']);
+
+      if ($field_info['type'] == 'image') {
+        $fields[$instance_info['field_name']]['validators'][] = 'validateImageField';
       }
     }
 
