@@ -7,6 +7,9 @@
 
 class EntityValidatorTestCase extends DrupalWebTestCase {
 
+  private $instance;
+  private $field;
+
   public static function getInfo() {
     return array(
       'name' => 'Validate entity',
@@ -16,7 +19,55 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('entity_validator', 'entity_validator_example');
+    parent::setUp('entity_validator', 'entity_validator_example', 'image');
+
+    // Create the article and attach the field image.
+    $this->drupalCreateContentType(array('name' => 'article'));
+
+    if (!field_info_field('field_image')) {
+      $field = array(
+        'field_name' => 'field_image',
+        'type' => 'image',
+        'cardinality' => 1,
+        'locked' => FALSE,
+        'indexes' => array('fid' => array('fid')),
+        'settings' => array(
+          'uri_scheme' => 'public',
+          'default_image' => FALSE,
+        ),
+        'storage' => array(
+          'type' => 'field_sql_storage',
+          'settings' => array(),
+        ),
+      );
+
+      $this->field = field_create_field($field);
+    }
+
+    if (!field_info_instance('node', 'field_image', 'article')) {
+      $instance = array(
+        'field_name' => 'field_image',
+        'entity_type' => 'node',
+        'label' => 'Image',
+        'bundle' => 'article',
+        'description' => st('Upload an image to go with this article.'),
+        'required' => FALSE,
+
+        'settings' => array(
+          'file_directory' => 'field/image',
+          'file_extensions' => 'png gif jpg jpeg',
+          'max_filesize' => '',
+          'max_resolution' => '200X200',
+          'min_resolution' => '100X100',
+          'alt_field' => TRUE,
+          'title_field' => '',
+        ),
+
+        'widget' => array(),
+      );
+
+      $this->instance = field_create_instance($instance);
+    }
   }
 
   /**
@@ -29,6 +80,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     );
     $node = entity_create('node', $values);
     $handler = entity_validator_get_validator_handler('node', 'article');
+
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->field_image->set(array('fid' => $this->createImage()->fid));
 
     try {
       $handler->validate($node);
@@ -78,5 +132,19 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
     );
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
+  }
+
+  private function createImage() {
+    $files = $this->drupalGetTestFiles('image');
+    $file = reset($files);
+
+    $source = new stdClass();
+    $source->uri = $file->uri;
+    $source->uid = 1;
+    $source->filemime = 'image/' . pathinfo($file->uri, PATHINFO_EXTENSION);
+    $source->filename = basename($file->uri);
+    $file = file_save($source);
+
+    return $file;
   }
 }

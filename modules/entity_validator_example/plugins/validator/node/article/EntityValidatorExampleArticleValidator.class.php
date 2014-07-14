@@ -15,7 +15,6 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
 
     $fields['title']['validators'][] = 'validateTitleText';
     $fields['body']['validators'][] = 'validateBodyText';
-    $fields['field_image']['validators'][] = 'isNotEmpty';
 
     return $fields;
   }
