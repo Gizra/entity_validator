@@ -269,6 +269,15 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
+    $file = file_load($value['fid']);
+    $url = file_create_url($file->uri);
+    $size = getimagesize($url);
+debug($size);
+    $value = array(
+      'width' => $size['0'],
+      'height' => $size['1'],
+    );
+
     $params = array(
       '@width' => $value['width'],
       '@height' => $value['height'],

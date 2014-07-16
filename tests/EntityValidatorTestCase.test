@@ -57,8 +57,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           'file_directory' => 'field/image',
           'file_extensions' => 'png gif jpg jpeg',
           'max_filesize' => '',
-          'max_resolution' => '200X200',
-          'min_resolution' => '100X100',
+          'min_resolution' => '30X10',
           'alt_field' => TRUE,
           'title_field' => '',
         ),
@@ -74,15 +73,15 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
    * Test the validation on an entity.
    */
   function testValidate() {
+    $file = $this->createImage();
     $values = array(
       'type' => 'article',
       'uid' => 0,
     );
     $node = entity_create('node', $values);
     $handler = entity_validator_get_validator_handler('node', 'article');
-
     $wrapper = entity_metadata_wrapper('node', $node);
-    $wrapper->field_image->set(array('fid' => $this->createImage()->fid));
+    $wrapper->field_image->set(array('fid' => $file->fid));
 
     try {
       $handler->validate($node);
@@ -131,6 +130,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
         ),
       ),
     );
+    debug($result);
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
   }
 
