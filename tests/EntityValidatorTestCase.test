@@ -24,48 +24,53 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     // Create the article and attach the field image.
     $this->drupalCreateContentType(array('name' => 'article'));
 
-    if (!field_info_field('field_image')) {
-      $field = array(
-        'field_name' => 'field_image',
-        'type' => 'image',
-        'cardinality' => 1,
-        'locked' => FALSE,
-        'indexes' => array('fid' => array('fid')),
-        'settings' => array(
-          'uri_scheme' => 'public',
-          'default_image' => FALSE,
-        ),
-        'storage' => array(
-          'type' => 'field_sql_storage',
-          'settings' => array(),
-        ),
-      );
+    $this->field = array(
+      'field_name' => 'field_image',
+      'type' => 'image',
+      'cardinality' => 1,
+      'locked' => FALSE,
+      'indexes' => array('fid' => array('fid')),
+      'settings' => array(
+        'uri_scheme' => 'public',
+        'default_image' => FALSE,
+      ),
+      'storage' => array(
+        'type' => 'field_sql_storage',
+        'settings' => array(),
+      ),
+    );
 
-      $this->field = field_create_field($field);
+    if (!field_info_field('field_image')) {
+      field_create_field($this->field);
     }
 
+    $this->instance = array(
+      'field_name' => 'field_image',
+      'entity_type' => 'node',
+      'label' => 'Image',
+      'bundle' => 'article',
+      'description' => st('Upload an image to go with this article.'),
+      'required' => FALSE,
+
+      'settings' => array(
+        'file_directory' => 'field/image',
+        'file_extensions' => 'png gif jpg jpeg',
+        'max_filesize' => '',
+        'max_resolution' => '39X19',
+        'min_resolution' => '41X21',
+        'alt_field' => TRUE,
+        'title_field' => '',
+        'default_image' => '',
+      ),
+
+      'widget' => array(),
+    );
+
     if (!field_info_instance('node', 'field_image', 'article')) {
-      $instance = array(
-        'field_name' => 'field_image',
-        'entity_type' => 'node',
-        'label' => 'Image',
-        'bundle' => 'article',
-        'description' => st('Upload an image to go with this article.'),
-        'required' => FALSE,
-
-        'settings' => array(
-          'file_directory' => 'field/image',
-          'file_extensions' => 'png gif jpg jpeg',
-          'max_filesize' => '',
-          'min_resolution' => '30X10',
-          'alt_field' => TRUE,
-          'title_field' => '',
-        ),
-
-        'widget' => array(),
-      );
-
-      $this->instance = field_create_instance($instance);
+      $this->instance = field_create_instance($this->instance);
+    }
+    else {
+      field_update_instance($this->instance);
     }
   }
 
@@ -116,24 +121,45 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       'body' => array(
         array(
           'message' => 'The @field should have the word "Gizra".',
-          'params' => array (
+          'params' => array(
             '@field' => 'body',
           ),
         ),
       ),
       'field_image' => array(
         array(
-          'message' => 'The field @field cannot be empty.',
-          'params' => array (
+          'message' => 'The width of the image(@width) is bigger then the allowed size(@max-width)',
+          'params' => array(
+            '@width' => 40,
+            '@height' => 20,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@field' => 'field_image',
+          ),
+        ),
+        array(
+          'message' => 'The width of the image(@height) is bigger then the allowed size(@min-height)',
+          'params' => array(
+            '@width' => 40,
+            '@height' => 20,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@min-width' => '21',
+            '@min-height' => '41',
             '@field' => 'field_image',
           ),
         ),
       ),
     );
-    debug($result);
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
   }
 
+  /**
+   * Create an image for testing the image validator.
+   *
+   * @return stdClass
+   *  The field object.
+   */
   private function createImage() {
     $files = $this->drupalGetTestFiles('image');
     $file = reset($files);

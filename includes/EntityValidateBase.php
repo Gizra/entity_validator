@@ -272,7 +272,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $file = file_load($value['fid']);
     $url = file_create_url($file->uri);
     $size = getimagesize($url);
-debug($size);
+
     $value = array(
       'width' => $size['0'],
       'height' => $size['1'],
@@ -284,7 +284,7 @@ debug($size);
     );
 
     if (!empty($settings['max_resolution'])) {
-      list($max_height, $max_width) = explode("x", $settings['max_resolution']);
+      list($max_height, $max_width) = explode("X", $settings['max_resolution']);
 
       $params += array(
         '@max-width' => $max_width,
@@ -301,19 +301,18 @@ debug($size);
     }
 
     if (!empty($settings['min_resolution'])) {
-      list($min_height, $min_width) = explode("x", $settings['min_resolution']);
-
+      list($min_height, $min_width) = explode("X", $settings['min_resolution']);
       $params += array(
         '@min-width' => $min_width,
         '@min-height' => $min_height,
       );
 
       if ($value['width'] < $min_width) {
-        $this->setError($field_name, 'The width of the image(@width) is bigger then the allowed size(@min-width) ', $params);
+        $this->setError($field_name, 'The width of the image(@width) is bigger then the allowed size(@min-width)', $params);
       }
 
       if ($value['height'] < $min_height) {
-        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height) ', $params);
+        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height)', $params);
       }
     }
   }
