@@ -68,14 +68,6 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
-      'field_image' => array(
-        array(
-          'message' => 'The field @field cannot be empty.',
-          'params' => array (
-            '@field' => 'field_image',
-          ),
-        ),
-      ),
     );
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
   }
