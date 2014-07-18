@@ -62,7 +62,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
       'body' => array(
         array(
-          'message' => 'The @field should have the word "Gizra".',
+          'message' => 'The @field should have the word "Drupal".',
           'params' => array (
             '@field' => 'body',
           ),
