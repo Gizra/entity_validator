@@ -98,13 +98,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     foreach ($instances_info as $instance_info) {
 
       if ($instance_info['required']) {
-        // Loading default value of the fields and the instance.
+        // Validate that required fields will not be empty.
         $fields[$instance_info['field_name']]['validators'][] = 'isNotEmpty';
       }
 
       $field_info = field_info_field($instance_info['field_name']);
 
       if ($field_info['type'] == 'image') {
+        // Add the image validation method for image fields.
         $fields[$instance_info['field_name']]['validators'][] = 'validateImageField';
       }
     }
