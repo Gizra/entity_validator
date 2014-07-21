@@ -32,8 +32,8 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    * Validate the description has the word "Gizra".
    */
   public function validateBodyText($field_name, $value) {
-    if (empty($value['value']) || strpos($value['value'], 'Gizra') === FALSE) {
-      $this->setError($field_name, 'The @field should have the word "Gizra".');
+    if (empty($value['value']) || strpos($value['value'], 'Drupal') === FALSE) {
+      $this->setError($field_name, 'The @field should have the word "Drupal".');
     }
   }
 }
