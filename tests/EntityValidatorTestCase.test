@@ -7,9 +7,6 @@
 
 class EntityValidatorTestCase extends DrupalWebTestCase {
 
-  private $instance;
-  private $field;
-
   public static function getInfo() {
     return array(
       'name' => 'Validate entity',
@@ -24,54 +21,19 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     // Create the article and attach the field image.
     $this->drupalCreateContentType(array('name' => 'article'));
 
-    $this->field = array(
-      'field_name' => 'field_image',
-      'type' => 'image',
-      'cardinality' => 1,
-      'locked' => FALSE,
-      'indexes' => array('fid' => array('fid')),
-      'settings' => array(
-        'uri_scheme' => 'public',
-        'default_image' => FALSE,
-      ),
-      'storage' => array(
-        'type' => 'field_sql_storage',
-        'settings' => array(),
-      ),
+    $instance = field_info_instance('node', 'field_image', 'article');
+    $instance['settings'] = array(
+      'file_directory' => 'field/image',
+      'file_extensions' => 'png gif jpg jpeg',
+      'max_filesize' => '',
+      'max_resolution' => '39X19',
+      'min_resolution' => '41X21',
+      'alt_field' => TRUE,
+      'title_field' => '',
+      'default_image' => '',
     );
 
-    if (!field_info_field('field_image')) {
-      field_create_field($this->field);
-    }
-
-    $this->instance = array(
-      'field_name' => 'field_image',
-      'entity_type' => 'node',
-      'label' => 'Image',
-      'bundle' => 'article',
-      'description' => st('Upload an image to go with this article.'),
-      'required' => FALSE,
-
-      'settings' => array(
-        'file_directory' => 'field/image',
-        'file_extensions' => 'png gif jpg jpeg',
-        'max_filesize' => '',
-        'max_resolution' => '39X19',
-        'min_resolution' => '41X21',
-        'alt_field' => TRUE,
-        'title_field' => '',
-        'default_image' => '',
-      ),
-
-      'widget' => array(),
-    );
-
-    if (!field_info_instance('node', 'field_image', 'article')) {
-      $this->instance = field_create_instance($this->instance);
-    }
-    else {
-      field_update_instance($this->instance);
-    }
+    field_update_instance($instance);
   }
 
   /**
