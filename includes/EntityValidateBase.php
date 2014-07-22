@@ -98,7 +98,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     foreach ($instances_info as $instance_info) {
 
       if ($instance_info['required']) {
-        // Validate that required fields will not be empty.
+        // Validate field is not empty.
         $fields[$instance_info['field_name']]['validators'][] = 'isNotEmpty';
       }
 
@@ -265,6 +265,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
   /**
    * Validate the field image: Check the image is the correct size.
+   *
+   * @param $field_name
+   *  The field name.
+   * @param $value
+   *  The value of the field.
    */
   public function validateImageField($field_name, $value) {
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
