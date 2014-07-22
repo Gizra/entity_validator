@@ -105,8 +105,13 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $field_info = field_info_field($instance_info['field_name']);
 
       if ($field_info['type'] == 'image') {
-        // Add the image validation method for image fields.
-        $fields[$instance_info['field_name']]['validators'][] = 'validateImageField';
+        // Validate the image dimensions.
+        $fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
+      }
+
+      if (in_array($fields['type'], array('image', 'file'))) {
+        // Validate the file type.
+        $fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
       }
     }
 
@@ -271,7 +276,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * @param $value
    *  The value of the field.
    */
-  public function validateImageField($field_name, $value) {
+  public function validateImageSize($field_name, $value) {
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
@@ -321,5 +326,20 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height)', $params);
       }
     }
+  }
+
+  /**
+   * Validating the file extension.
+   *
+   * @param $field_name
+   *  The field name.
+   * @param $value
+   *  The value of the field.
+   *
+   * todo: check the file extension.
+   */
+  public function validateFileExtension($field_name, $value) {
+    $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
+    $settings = $info['settings'];
   }
 }
