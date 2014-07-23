@@ -102,11 +102,10 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   public function getFieldsInfo() {
     $fields = $this->setfieldsInfo();
 
-    foreach ($fields as $field_name => $info) {
-      // Loading default value of the fields and the instance.
-      $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
-
-      if ($instance_info['required']) {
+    // Add all fields.
+    foreach (field_info_instances($this->entityType, $this->bundle) as $field_name => $info) {
+      $field_info = field_info_field($field_name);
+      if ($info['required']) {
         $fields[$field_name]['validators'][] = 'isNotEmpty';
       }
     }
@@ -230,6 +229,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * @return boolean
    */
   public function isNotEmpty($field_name, $value) {
+    if (is_array($value) && isset($value['value'])) {
+      $value = $value['value'];
+    }
     if (empty($value)) {
       $params = array(
         '@field' => $field_name,
