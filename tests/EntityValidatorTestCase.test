@@ -24,7 +24,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $instance = field_info_instance('node', 'field_image', 'article');
     $instance['settings'] = array(
       'file_directory' => 'field/image',
-      'file_extensions' => 'png gif jpg jpeg',
+      'file_extensions' => 'pdf',
       'max_filesize' => '',
       'max_resolution' => '39X19',
       'min_resolution' => '41X21',
@@ -108,6 +108,15 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
             '@max-height' => '39',
             '@min-width' => '21',
             '@min-height' => '41',
+            '@field' => 'field_image',
+          ),
+        ),
+        array(
+          'message' => 'The file(@file-name) extension(@extension) did not match the allowed extensions: @extensions',
+          'params' => array(
+            '@file-name' => 'image-test.png',
+            '@extension' => 'image-test',
+            '@extensions' => 'pdf',
             '@field' => 'field_image',
           ),
         ),

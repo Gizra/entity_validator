@@ -109,7 +109,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         $fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
       }
 
-      if (in_array($fields['type'], array('image', 'file'))) {
+      if (in_array($field_info['type'], array('image', 'file'))) {
         // Validate the file type.
         $fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
       }
@@ -335,11 +335,23 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *  The field name.
    * @param $value
    *  The value of the field.
-   *
-   * todo: check the file extension.
    */
   public function validateFileExtension($field_name, $value) {
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
+
+    $file = file_load($value['fid']);
+
+    $extensions = explode('.', $file->filename);
+    $extension = reset($extensions);
+
+    if (!in_array($extension, explode(" ", $settings['file_extensions']))) {
+      $params = array(
+        '@file-name' => $file->filename,
+        '@extension' => $extension,
+        '@extensions' => $settings['file_extensions'],
+      );
+      $this->setError($field_name, 'The file(@file-name) extension(@extension) did not match the allowed extensions: @extensions', $params);
+    }
   }
 }
