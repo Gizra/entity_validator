@@ -277,6 +277,10 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *  The value of the field.
    */
   public function validateImageSize($field_name, $value) {
+    if (empty($value)) {
+      return;
+    }
+
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
@@ -295,7 +299,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     );
 
     if (!empty($settings['max_resolution'])) {
-      list($max_height, $max_width) = explode("X", $settings['max_resolution']);
+      list($max_height, $max_width) = explode("x", $settings['max_resolution']);
 
       $params += array(
         '@max-width' => $max_width,
@@ -312,7 +316,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     }
 
     if (!empty($settings['min_resolution'])) {
-      list($min_height, $min_width) = explode("X", $settings['min_resolution']);
+      list($min_height, $min_width) = explode("x", $settings['min_resolution']);
       $params += array(
         '@min-width' => $min_width,
         '@min-height' => $min_height,
@@ -337,13 +341,17 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *  The value of the field.
    */
   public function validateFileExtension($field_name, $value) {
+    if (empty($value)) {
+      return;
+    }
+
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
     $file = file_load($value['fid']);
 
     $extensions = explode('.', $file->filename);
-    $extension = reset($extensions);
+    $extension = end($extensions);
 
     if (!in_array($extension, explode(" ", $settings['file_extensions']))) {
       $params = array(
@@ -351,7 +359,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@extension' => $extension,
         '@extensions' => $settings['file_extensions'],
       );
-      $this->setError($field_name, 'The file(@file-name) extension(@extension) did not match the allowed extensions: @extensions', $params);
+      $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
     }
   }
 }
