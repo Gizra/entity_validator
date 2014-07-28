@@ -79,35 +79,39 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setFieldsInfo() {
-    $fields_info = array();
+  public function getFieldsInfo() {
+    $fields = array();
     $entity_info = entity_get_info($this->entityType);
     $keys = $entity_info['entity keys'];
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
-      $fields_info[$keys['label']] = array(
+      $fields[$keys['label']] = array(
         'validators' => array(
           'isNotEmpty',
         ),
       );
     }
 
-    return $fields_info;
-  }
+    $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldsInfo() {
-    $fields = $this->setfieldsInfo();
-
-    foreach ($fields as $field_name => $info) {
-      // Loading default value of the fields and the instance.
-      $instance_info = field_info_instance($this->entityType, $field_name, $this->bundle);
+    foreach ($instances_info as $instance_info) {
 
       if ($instance_info['required']) {
-        $fields[$field_name]['validators'][] = 'isNotEmpty';
+        // Validate field is not empty.
+        $fields[$instance_info['field_name']]['validators'][] = 'isNotEmpty';
+      }
+
+      $field_info = field_info_field($instance_info['field_name']);
+
+      if ($field_info['type'] == 'image') {
+        // Validate the image dimensions.
+        $fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
+      }
+
+      if (in_array($field_info['type'], array('image', 'file'))) {
+        // Validate the file type.
+        $fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
       }
     }
 
@@ -261,6 +265,101 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       );
 
       $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+    }
+  }
+
+  /**
+   * Validate the field image: Check the image is the correct size.
+   *
+   * @param $field_name
+   *  The field name.
+   * @param $value
+   *  The value of the field.
+   */
+  public function validateImageSize($field_name, $value) {
+    if (empty($value)) {
+      return;
+    }
+
+    $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
+    $settings = $info['settings'];
+
+    $file = file_load($value['fid']);
+    $url = file_create_url($file->uri);
+    $size = getimagesize($url);
+
+    $value = array(
+      'width' => $size['0'],
+      'height' => $size['1'],
+    );
+
+    $params = array(
+      '@width' => $value['width'],
+      '@height' => $value['height'],
+    );
+
+    if (!empty($settings['max_resolution'])) {
+      list($max_height, $max_width) = explode("X", $settings['max_resolution']);
+
+      $params += array(
+        '@max-width' => $max_width,
+        '@max-height' => $max_height,
+      );
+
+      if ($value['width'] > $max_width) {
+        $this->setError($field_name, 'The width of the image(@width) is bigger then the allowed size(@max-width)', $params);
+      }
+
+      if ($value['height'] > $max_height) {
+        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@max-height)', $params);
+      }
+    }
+
+    if (!empty($settings['min_resolution'])) {
+      list($min_height, $min_width) = explode("X", $settings['min_resolution']);
+      $params += array(
+        '@min-width' => $min_width,
+        '@min-height' => $min_height,
+      );
+
+      if ($value['width'] < $min_width) {
+        $this->setError($field_name, 'The width of the image(@width) is bigger then the allowed size(@min-width)', $params);
+      }
+
+      if ($value['height'] < $min_height) {
+        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height)', $params);
+      }
+    }
+  }
+
+  /**
+   * Validating the file extension.
+   *
+   * @param $field_name
+   *  The field name.
+   * @param $value
+   *  The value of the field.
+   */
+  public function validateFileExtension($field_name, $value) {
+    if (empty($value)) {
+      return;
+    }
+
+    $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
+    $settings = $info['settings'];
+
+    $file = file_load($value['fid']);
+
+    $extensions = explode('.', $file->filename);
+    $extension = end($extensions);
+
+    if (!in_array($extension, explode(" ", $settings['file_extensions']))) {
+      $params = array(
+        '@file-name' => $file->filename,
+        '@extension' => $extension,
+        '@extensions' => $settings['file_extensions'],
+      );
+      $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
     }
   }
 }
