@@ -16,19 +16,39 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('entity_validator', 'entity_validator_example');
+    parent::setUp('entity_validator', 'entity_validator_example', 'image');
+
+    // Create the article and attach the field image.
+    $this->drupalCreateContentType(array('name' => 'article'));
+
+    $instance = field_info_instance('node', 'field_image', 'article');
+    $instance['settings'] = array(
+      'file_directory' => 'field/image',
+      'file_extensions' => 'pdf',
+      'max_filesize' => '',
+      'max_resolution' => '39X19',
+      'min_resolution' => '41X21',
+      'alt_field' => TRUE,
+      'title_field' => '',
+      'default_image' => '',
+    );
+
+    field_update_instance($instance);
   }
 
   /**
    * Test the validation on an entity.
    */
   function testValidate() {
+    $file = $this->createImage();
     $values = array(
       'type' => 'article',
       'uid' => 0,
     );
     $node = entity_create('node', $values);
     $handler = entity_validator_get_validator_handler('node', 'article');
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->field_image->set(array('fid' => $file->fid));
 
     try {
       $handler->validate($node);
@@ -68,7 +88,60 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
+      'field_image' => array(
+        array(
+          'message' => 'The width of the image(@width) is bigger then the allowed size(@max-width)',
+          'params' => array(
+            '@width' => 40,
+            '@height' => 20,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@field' => 'field_image',
+          ),
+        ),
+        array(
+          'message' => 'The width of the image(@height) is bigger then the allowed size(@min-height)',
+          'params' => array(
+            '@width' => 40,
+            '@height' => 20,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@min-width' => '21',
+            '@min-height' => '41',
+            '@field' => 'field_image',
+          ),
+        ),
+        array(
+          'message' => 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions',
+          'params' => array (
+            '@file-name' => 'image-test.png',
+            '@extension' => 'png',
+            '@extensions' => 'pdf',
+            '@field' => 'field_image',
+          ),
+        ),
+      ),
     );
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
+  }
+
+  /**
+   * Create an image for testing the image validator.
+   *
+   * @return stdClass
+   *  The field object.
+   */
+  private function createImage() {
+    $files = $this->drupalGetTestFiles('image');
+    $file = reset($files);
+
+    $source = new stdClass();
+    $source->uri = $file->uri;
+    $source->uid = 1;
+    $source->filemime = 'image/' . pathinfo($file->uri, PATHINFO_EXTENSION);
+    $source->filename = basename($file->uri);
+    $file = file_save($source);
+
+    return $file;
   }
 }
