@@ -299,7 +299,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     );
 
     if (!empty($settings['max_resolution'])) {
-      list($max_height, $max_width) = explode("x", $settings['max_resolution']);
+      list($max_height, $max_width) = explode("X", $settings['max_resolution']);
 
       $params += array(
         '@max-width' => $max_width,
@@ -316,7 +316,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     }
 
     if (!empty($settings['min_resolution'])) {
-      list($min_height, $min_width) = explode("x", $settings['min_resolution']);
+      list($min_height, $min_width) = explode("X", $settings['min_resolution']);
       $params += array(
         '@min-width' => $min_width,
         '@min-height' => $min_height,

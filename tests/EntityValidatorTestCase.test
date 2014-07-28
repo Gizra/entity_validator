@@ -112,10 +112,10 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
         array(
-          'message' => 'The file(@file-name) extension(@extension) did not match the allowed extensions: @extensions',
-          'params' => array(
+          'message' => 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions',
+          'params' => array (
             '@file-name' => 'image-test.png',
-            '@extension' => 'image-test',
+            '@extension' => 'png',
             '@extensions' => 'pdf',
             '@field' => 'field_image',
           ),
