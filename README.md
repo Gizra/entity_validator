@@ -108,8 +108,83 @@ You can also see that the the text we set as an error did not pass
 through t(). That's correct. When displaying the errors to the user, by default,
 the text is passed via t(). We get to this part later.
 
+Another handler is the pre-process handler:
+```php
+  /**
+   * Overrides EntityValidateBase::getFieldsInfo().
+   */
+  public function getFieldsInfo() {
+    $fields = parent::getFieldsInfo();
 
+    $fields['title']['preprocess'][] = 'preprocessTitleText';
 
+    return $fields;
+  }
+
+  /**
+   * Altering the title of the node.
+   */
+  public function preprocessTitleText($field_name, $value) {
+    return 'This is a new title';
+  }
+```
+
+## Interact with the entity validator
+After setting the methods you, or of your modules, need to validate an object.
+First initialize the object it self:
+
+```php
+$handler = entity_validator_get_validator_handler('node', 'article');
+```
+
+You can validate an object in three ways:
+1. With exceptions:
+```php
+$handler->validate($node);
+```
+If there any errors set by the methods you'll get them as an exceptions.
+
+2. If you just want to see if there any error, without getting exceptions, you
+can use a silent mode:
+
+```php
+$result = $handler->validate($node, TRUE);
+```
+The $result will be a boolean variable.
+
+3. You can handle the errors by your self. You'll need first to validate the
+object in a silent way, exactly like in 2. You can get the errors squashed, all
+the placeholders from the errors replaced by the real value, i.e: @field
+replaced with the name of the field:
+
+```php
+    $result = $handler->validate($node, TRUE);
+    if($result) {
+      drupal_set_message(t('Validate in silent mode did not throw an exception.'), 'error');
+    }
+```
+
+You can get the errors without being squashed. This will return an array in the
+next format:
+```php
+    $result = $handler->getErrors(FALSE);
+    $expected_result = array(
+      'title' => array(
+        array(
+          'message' => 'The field @field cannot be empty.',
+          'params' => array(
+            '@field' => 'title',
+          ),
+        ),
+        array(
+          'message' => 'The @field should be at least 3 characters long.',
+          'params' => array(
+            '@field' => 'title',
+          ),
+        ),
+      ),
+    );
+```
 
 ## Credits
 
