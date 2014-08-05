@@ -2,16 +2,18 @@
 
 # Entity Validator
 The entity validator try to solve a simple problem in Drupal 7: validate the
-entity object before they written into the DB.
+entity object before written them into the DB. That problem solved in Drupal 8
+due to the OOP approach and the understanding that the written data to the DB
+need to be valid.
 
-The first thought that cross your head is: "When is submit a node's form i get
+The first thought that cross your head is: "When is submit the node's form i get
 errors. What's the problem?". The problem is that the validation is done in the
 form level. If you take for example the feed module you can understand the issue
 a little bit more. The feed module can create nodes without titles. This is
 wrong since the node title is a required field.
 
 ## The basics
-*All the example are taken form the entity validator example module.*
+*All the example are taken from the entity validator example module.*
 
 You'll first need to declare a ctools plugin directory for you module:
 ```php
@@ -26,7 +28,7 @@ function entity_validator_example_ctools_plugin_directory($module, $plugin) {
 
 ```
 
-After that you'll need to create a the next structure:
+After that you'll need to create the next files structure:
 |- validator
 
 |-- *entity_type*
@@ -69,16 +71,17 @@ After defining the validator handler we can start and set the method for that:
   }
 ```
 
-In this method we are defining the fields and properties handlers. There are two
+In this method we defining the fields and properties handlers. There are two
 type of handlers:
   - Validator - In a validator method you can set errors according to the
-    value the the field/property have.
-  - Pre-process - Although this is not in use you can change the field/property
+    value the field/property have.
+  - Pre-process - Although this is not in use, you can change the field/property
     value.
 
-The example above validate the title property and the body field. Although
-required fields or a mandatory properties are automatically checked they not
-empty, the example module add another validators as a proof of concept:
+The next example set validators to the title property and the body field.
+Although required fields or a mandatory properties are automatically checked
+for not being empty, the example module add another validators as a proof of
+concept:
 ```php
   /**
    * Validate the title is at least 3 characters long.
@@ -99,11 +102,13 @@ empty, the example module add another validators as a proof of concept:
   }
 ```
 
-You can see that the *validateTitleText* method checked the length of the
-string. 
+You can see that the *validateTitleText* method checking the length of the
+string.
 You can also see that the the text we set as an error did not pass
-through a t() function. That's correct. When displaying the errors to the user,
-by default, the text is passed via t(). We get to this part later.
+through t(). That's correct. When displaying the errors to the user, by default,
+the text is passed via t(). We get to this part later.
+
+
 
 
 ## Credits
