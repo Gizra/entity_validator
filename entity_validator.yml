@@ -1,0 +1,4 @@
+services:
+  plugin.manager.entity_validator:
+    class: Drupal\entity_validator\EntityValidatorPluginManger
+    parent: default_plugin_manager

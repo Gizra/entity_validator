@@ -1,0 +1,4 @@
+name: Entity validator
+description: Programmatically validate entities.
+core: 8.x
+type: module

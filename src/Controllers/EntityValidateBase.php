@@ -1,5 +1,6 @@
 <?php
 
+namespace Drupal\entity_validator\Controllers;
 /**
  * Abstract entity validation.
  */

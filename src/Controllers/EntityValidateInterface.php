@@ -1,5 +1,7 @@
 <?php
 
+namespace Drupal\entity_validator\Controllers;
+
 interface EntityValidateInterface {
 
   /**
