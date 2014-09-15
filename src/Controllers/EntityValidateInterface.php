@@ -7,12 +7,9 @@ use Drupal\entity_validator\Exceptions\EntityValidatorException;
 interface EntityValidateInterface {
 
   /**
-   * Constructor for the Validator handler.
-   *
-   * @param $plugin
-   *   The validator plugin object.
+   * {@inheritdoc}
    */
-  public function __construct($plugin);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition);
 
   /**
    * Set the bundle of the node.

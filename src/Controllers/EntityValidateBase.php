@@ -47,15 +47,13 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
   protected $errors = array();
 
   /**
-   * Constructs a EntityValidateBase object.
-   *
-   * @param array $plugin
-   *   Plugin definition.
+   * {@inheritdoc}
    */
-  public function __construct($plugin) {
-    $this->plugin = $plugin;
-    $this->entityType = $plugin['entity_type'];
-    $this->bundle = $plugin['bundle'];
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    parent::__construct($configuration , $plugin_id, $plugin_definition);
+//    $this->plugin = $plugin;
+//    $this->entityType = $plugin['entity_type'];
+//    $this->bundle = $plugin['bundle'];
   }
 
   /**
@@ -90,12 +88,19 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
   }
 
   /**
+   * Get the fields instances of the current entity.
+   */
+  public function getFieldsInstances() {
+    // todo: Do it.
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getFieldsInfo() {
     $fields = array();
-    $entity_info = entity_get_info($this->entityType);
-    $keys = $entity_info['entity keys'];
+    $entity_info = \Drupal::entityManager()->getDefinition($this->entityType);
+    $keys = $entity_info->getKeys();;
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
@@ -106,6 +111,7 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
       );
     }
 
+    // todo: Query against the field info instance entity.
     $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
 
     foreach ($instances_info as $instance_info) {
