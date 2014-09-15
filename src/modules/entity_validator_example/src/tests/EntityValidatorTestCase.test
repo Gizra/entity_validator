@@ -1,11 +1,15 @@
 <?php
-
 /**
  * @file
- * Contains EntityValidatorTestCase.
+ * Contains Drupal\entity_validator\Tests\EntityValidatorTestCase.
  */
 
-class EntityValidatorTestCase extends DrupalWebTestCase {
+
+namespace Drupal\entity_validator\Tests;
+
+use Drupal\simpletest\WebTestBase;
+
+class EntityValidatorTestCase extends WebTestBase {
 
   public static function getInfo() {
     return array(

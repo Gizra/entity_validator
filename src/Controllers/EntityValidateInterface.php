@@ -2,6 +2,8 @@
 
 namespace Drupal\entity_validator\Controllers;
 
+use Drupal\entity_validator\Exceptions\EntityValidatorException;
+
 interface EntityValidateInterface {
 
   /**
@@ -74,7 +76,7 @@ interface EntityValidateInterface {
    * @param $params
    *  Optional. The parameters for the t() function.
    *
-   * @throws Exception
+   * @throws \Exception
    *  When setting the error level to 1 exception will be thrown with the value
    *  of the error.
    *

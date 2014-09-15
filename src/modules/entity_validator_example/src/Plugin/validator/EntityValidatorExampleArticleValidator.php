@@ -1,10 +1,23 @@
 <?php
 
-/**
- * @file
- * Contains EntityValidatorExampleArticleValidator.
- */
+$plugin = array(
+  'description' => t('Validate the article content type.'),
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'class' => 'EntityValidatorExampleArticleValidator',
+);
 
+
+
+/**
+ * @EntityValidator(
+ *  id = node-article,
+ *  label = @Translation('Article'),
+ *  description = @Translation('Validate the article of content type'),
+ *  entity_type = 'node',
+ *  bundle = 'article'
+ * )
+ */
 class EntityValidatorExampleArticleValidator extends EntityValidateBase {
 
   /**

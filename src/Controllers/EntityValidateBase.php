@@ -1,10 +1,22 @@
 <?php
 
+/**
+ * @file
+ * Contains Drupal\entity_validate\Controllers\EntityValidateBase.
+ */
+
 namespace Drupal\entity_validator\Controllers;
+
+use Drupal\Core\Plugin\PluginBase;
+
 /**
  * Abstract entity validation.
+ *
+ * This class is the base class for the other entity validator plugins. The
+ * class holds sets of tools that will help the developer validate the entity
+ * properties.
  */
-abstract class EntityValidateBase implements EntityValidateInterface {
+abstract class EntityValidateBase extends PluginBase implements EntityValidateInterface {
 
   /**
    * The entity type.
@@ -177,7 +189,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *  Determine if we need to assign the from the callback to the field. Default
    *  to FALSE.
    */
-  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
+  protected function invokeMethods($property_wrapper, array $methods, $assign_value = FALSE) {
     foreach ($methods as $method) {
       $value = $property_wrapper->value();
 

@@ -1,0 +1,7 @@
+name: Entity validator example
+description: Example module for the Entity validator module.
+core: 8.x
+type: module
+
+dependencies:
+  - entity_validator

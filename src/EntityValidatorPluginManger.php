@@ -28,7 +28,7 @@ class EntityValidatorPluginManger extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/validator', $namespaces, $module_handler, 'Drupal\entity_validator\Annotation\EntityValidator');
+    parent::__construct('Plugin/validator', $namespaces, $module_handler, NULL, 'Drupal\entity_validator\Annotation\EntityValidator');
     $this->alterInfo('entity_validator_alter');
     $this->setCacheBackend($cache_backend, 'entity_validator');
   }
