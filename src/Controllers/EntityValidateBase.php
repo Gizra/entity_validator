@@ -8,6 +8,8 @@
 namespace Drupal\entity_validator\Controllers;
 
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\entity_validator\Exceptions\EntityValidatorException;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Abstract entity validation.
@@ -90,7 +92,27 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
   /**
    * Get the fields instances of the current entity.
    */
-  public function getFieldsInstances() {
+  public static function getFieldsInstances($entity_type = '', $bundle = '') {
+    $query = \Drupal::entityQuery('field_storage_config');
+
+    if ($entity_type) {
+      $query->condition('entity_type', $entity_type);
+    }
+
+    $results = $query->execute();
+
+    /** @var FieldStorageConfig[] $configs */
+    $configs = entity_load_multiple('field_storage_config', array_keys($results));
+
+    if ($bundle) {
+      foreach ($configs as $delta => $config) {
+        if (!in_array($bundle, $config->getBundles())) {
+          // Not working :/
+        }
+      }
+    }
+
+    return $configs;
     // todo: Do it.
   }
 
@@ -100,7 +122,7 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
   public function getFieldsInfo() {
     $fields = array();
     $entity_info = \Drupal::entityManager()->getDefinition($this->entityType);
-    $keys = $entity_info->getKeys();;
+    $keys = $entity_info->getKeys();
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
@@ -180,7 +202,7 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
     }
 
     $params = array('@errors' => $errors);
-    throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
+    throw new EntityValidatorException(format_string('The validation process failed: @errors', $params));
   }
 
   /**
