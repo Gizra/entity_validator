@@ -22,9 +22,16 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * List of fields keyed by machine name and valued with the field's value.
    *
-   * @var Array.
+   * Array with the optional values:
+   * - "property": The entity property (e.g. "title", "nid").
+   * - "sub_property": A sub property name of a property to take from it the
+   *   content. This can be used for example on a text field with filtered text
+   *   input format where we would need to do $wrapper->body->value->value().
+   *   Defaults to FALSE.
+   *
+   * @var array
    */
-  protected $fields = array();
+  protected $publicFields = array();
 
   /**
    * Store the errors in case the error set to 0.
@@ -79,43 +86,57 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldsInfo() {
-    $fields = array();
+  public function publicFieldsInfo() {
+    $public_fields = array();
     $entity_info = entity_get_info($this->entityType);
     $keys = $entity_info['entity keys'];
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
-      $fields[$keys['label']] = array(
-        'validators' => array(
-          'isNotEmpty',
-        ),
+      $public_fields[$keys['label']] = array(
+        'required' => TRUE,
       );
     }
 
     $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
-
     foreach ($instances_info as $instance_info) {
 
       if ($instance_info['required']) {
         // Validate field is not empty.
-        $fields[$instance_info['field_name']]['validators'][] = 'isNotEmpty';
+        $public_fields[$instance_info['field_name']]['required'] = TRUE;
       }
 
       $field_info = field_info_field($instance_info['field_name']);
 
       if ($field_info['type'] == 'image') {
         // Validate the image dimensions.
-        $fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
+        $public_fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
       }
 
       if (in_array($field_info['type'], array('image', 'file'))) {
         // Validate the file type.
-        $fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
+        $public_fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
       }
     }
 
-    return $fields;
+    return $public_fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPublicFields() {
+    $public_fields = $this->publicFieldsInfo();
+    foreach ($public_fields as $property => &$public_field) {
+
+      // Set default values.
+      $public_field += array(
+        'property' => $property,
+        'sub_property',
+        'required' => FALSE,
+        'validators' => array('isValidValue'),
+      );
+    }
   }
 
   /**
@@ -124,30 +145,34 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   public function validate($entity, $silent = FALSE) {
     // Clear any previous error messages.
     $this->clearErrors();
-    if (!$fields_info = $this->getFieldsInfo()) {
+    if (!$public_fields = $this->getPublicFields()) {
       return TRUE;
     }
 
     $wrapper = entity_metadata_wrapper($this->entityType, $entity);
 
     // Collect the fields callbacks.
-    foreach ($fields_info as $field_name => $info) {
-      $property = isset($info['property']) ? $info['property'] : $field_name;
+    foreach ($public_fields as $public_field) {
+      $property = $public_field['property'];
 
-      if (!empty($info['preprocess'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['preprocess'], TRUE);
-      }
+      foreach ($public_field['validators'] as $validator) {
+        $property_wrapper = $wrapper->{$property};
 
-      // Loading default value of the fields and the instance.
-      $field_info = field_info_field($field_name);
-      $field_type_info = field_info_field_types($field_info['type']);
+        if ($public_field['sub_property']) {
+          $property_wrapper = $property_wrapper->{$public_field['sub_property']};
+        }
 
-      if (isset($field_type_info['property_type']) && $wrapper->{$property}->value()) {
-        $this->isValidValue($field_name, $wrapper->{$property}->value(), $field_type_info['property_type']);
-      }
+        $value = $property_wrapper->value();
 
-      if (!empty($info['validators'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['validators']);
+        if ($public_field['required']) {
+          // Property is required.
+          $this->isNotEmpty($property, $value, $wrapper, $property_wrapper);
+        }
+
+        if ($value) {
+          // Property has value.
+          call_user_func($validator, $property, $value, $wrapper, $property_wrapper);
+        }
       }
     }
 
@@ -162,31 +187,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     $params = array('@errors' => $errors);
     throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
-  }
-
-  /**
-   * Preprocess the field. This is useful when we need to alter a field before
-   * the validation process.
-   *
-   * @param \EntityMetadataWrapper $property_wrapper
-   *  The property wrapper.
-   * @param array $methods
-   *  Array of methods.
-   * @param bool $assign_value
-   *  Determine if we need to assign the from the callback to the field. Default
-   *  to FALSE.
-   */
-  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
-    foreach ($methods as $method) {
-      $value = $property_wrapper->value();
-
-      $info = $property_wrapper->info();
-      $new_value = $this->{$method}($info['name'], $value);
-      if ($assign_value && $new_value != $value) {
-        // Setting the fields value with the wrapper.
-        $property_wrapper->set($value);
-      }
-    }
   }
 
   /**
@@ -226,46 +226,58 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * Verify the field is not empty.
    *
-   * @param $field_name
+   * @param string $field_name
    *  The field name.
-   * @param $value
+   * @param mix $value
    *  The value of the field.
-   *
-   * @return boolean
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function isNotEmpty($field_name, $value) {
+  public function isNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
-      $params = array(
-        '@field' => $field_name,
-      );
-
+      $params = array('@field' => $field_name);
       $this->setError($field_name, 'The field @field cannot be empty.', $params);
     }
   }
 
   /**
-   * Special validate callback: usually all the validator have two arguments,
-   * value and field. This validate method check the value of the field using
-   * the entity API module.
+   * Check the value of the field using the entity API module.
    *
-   * @param $field_name
+   * @param string $field_name
    *  The field name.
-   * @param $value
+   * @param mix $value
    *  The value of the field.
-   * @param $type
-   *  The type of the field.
-   *
-   * @return boolean
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function isValidValue($field_name, $value, $type) {
-    if (!entity_property_verify_data_type($value, $type)) {
-      $params = array(
-        '@value' => (String) $value,
-        '@field' => $field_name,
-      );
-
-      $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+  public function isValidValue($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+    // Loading default value of the fields and the instance.
+    if (!$field_info = field_info_field($field_name)) {
+      // Not a field.
+      return;
     }
+
+    $field_type_info = field_info_field_types($field_info['type']);
+
+    if (empty($field_type_info['property_type'])) {
+      return;
+    }
+
+    if (entity_property_verify_data_type($value, $field_type_info['property_type'])) {
+      // Value is valid.
+      return;
+    }
+
+    $params = array(
+      '@value' => (String) $value,
+      '@field' => $field_name,
+    );
+
+    $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
   }
 
   /**

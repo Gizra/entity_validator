@@ -8,15 +8,22 @@
 class EntityValidatorExampleArticleValidator extends EntityValidateBase {
 
   /**
-   * Overrides EntityValidateBase::getFieldsInfo().
+   * Overrides EntityValidateBase::publicFieldsInfo().
    */
-  public function getFieldsInfo() {
-    $fields = parent::getFieldsInfo();
+  public function publicFieldsInfo() {
+    $public_fields = parent::publicFieldsInfo();
 
-    $fields['title']['validators'][] = 'validateTitleText';
-    $fields['body']['validators'][] = 'validateBodyText';
+    $public_fields['title']['validators'][] = 'validateTitleText';
 
-    return $fields;
+    $public_fields['body'] = array(
+      'required' => TRUE,
+      'sub_property' => 'value',
+      'validators' => array(
+        'validateBodyText'
+      ),
+    );
+
+    return $public_fields;
   }
 
   /**
@@ -29,10 +36,10 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   }
 
   /**
-   * Validate the description has the word "Gizra".
+   * Validate the description has the word "Drupal".
    */
   public function validateBodyText($field_name, $value) {
-    if (empty($value['value']) || strpos($value['value'], 'Drupal') === FALSE) {
+    if (strpos($value, 'Drupal') === FALSE) {
       $this->setError($field_name, 'The @field should have the word "Drupal".');
     }
   }

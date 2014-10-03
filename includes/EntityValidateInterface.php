@@ -43,11 +43,20 @@ interface EntityValidateInterface {
   public function getEntityType();
 
   /**
-   * Set the field validate and preprocess methods.
+   * Return array with the field validate and preprocess methods.
    *
-   * @return Array.
+   * @return array
    */
-  public function getFieldsInfo();
+  public function publicFieldsInfo();
+
+
+  /**
+   *
+   * Return the processed array with the field validation declerations.
+   *
+   * @return array
+   */
+  public function getPublicFields();
 
   /**
    * Initialize the validate process.
