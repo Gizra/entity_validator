@@ -110,12 +110,12 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
       if ($field_info['type'] == 'image') {
         // Validate the image dimensions.
-        $public_fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
+        $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateImageSize');
       }
 
       if (in_array($field_info['type'], array('image', 'file'))) {
         // Validate the file type.
-        $public_fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
+        $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateFileExtension');
       }
     }
 
@@ -134,7 +134,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         'property' => $property,
         'sub_property',
         'required' => FALSE,
-        'validators' => array('isValidValue'),
+        'validators' => array($this, 'isValidValue'),
       );
     }
   }
