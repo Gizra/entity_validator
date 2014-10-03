@@ -235,7 +235,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * @param EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  public function isNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  protected function isNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       $params = array('@field' => $field_name);
       $this->setError($field_name, 'The field @field cannot be empty.', $params);
@@ -254,7 +254,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * @param EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  public function isValidValue($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  protected function isValidValue($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     // Loading default value of the fields and the instance.
     if (!$field_info = field_info_field($field_name)) {
       // Not a field.
@@ -281,14 +281,18 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * Validate the field image: Check the image is the correct size.
+   * Validate the field image's by checking the image size is valid.
    *
-   * @param $field_name
+   * @param string $field_name
    *  The field name.
-   * @param $value
+   * @param mix $value
    *  The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function validateImageSize($field_name, $value) {
+  protected function validateImageSize($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       return;
     }
@@ -345,14 +349,18 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * Validating the file extension.
+   * Validate the file extension.
    *
-   * @param $field_name
+   * @param string $field_name
    *  The field name.
-   * @param $value
+   * @param mix $value
    *  The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function validateFileExtension($field_name, $value) {
+  protected function validateFileExtension($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       return;
     }
