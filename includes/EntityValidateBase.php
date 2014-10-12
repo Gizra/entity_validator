@@ -228,7 +228,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *
    * @param string $field_name
    *  The field name.
-   * @param mix $value
+   * @param mixed $value
    *  The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
@@ -247,7 +247,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *
    * @param string $field_name
    *  The field name.
-   * @param mix $value
+   * @param mixed $value
    *  The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
@@ -285,7 +285,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *
    * @param string $field_name
    *  The field name.
-   * @param mix $value
+   * @param mixed $value
    *  The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
@@ -353,7 +353,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    *
    * @param string $field_name
    *  The field name.
-   * @param mix $value
+   * @param mixed $value
    *  The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.

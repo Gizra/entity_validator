@@ -31,7 +31,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    *
    * @param string $field_name
    *  The field name.
-   * @param mix $value
+   * @param mixed $value
    *  The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
@@ -49,7 +49,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    *
    * @param string $field_name
    *  The field name.
-   * @param mix $value
+   * @param mixed $value
    *  The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
