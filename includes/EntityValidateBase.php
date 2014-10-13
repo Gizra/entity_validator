@@ -137,6 +137,8 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         'validators' => array($this, 'isValidValue'),
       );
     }
+
+    return $public_fields;
   }
 
   /**
