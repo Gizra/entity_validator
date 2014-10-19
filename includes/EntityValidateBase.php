@@ -135,7 +135,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $property = isset($info['property']) ? $info['property'] : $field_name;
 
       if (!empty($info['preprocess'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['preprocess'], TRUE);
+        $this->invokeMethods($wrapper, $property, $info['preprocess'], TRUE);
       }
 
       // Loading default value of the fields and the instance.
@@ -147,7 +147,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if (!empty($info['validators'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['validators']);
+        $this->invokeMethods($wrapper, $property, $info['validators']);
       }
     }
 
@@ -168,20 +168,24 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * Preprocess the field. This is useful when we need to alter a field before
    * the validation process.
    *
-   * @param \EntityMetadataWrapper $property_wrapper
-   *  The property wrapper.
+   * @param \EntityMetadataWrapper $wrapper
+   *  The wrapper object.
+   * @param string $property_name
+   *  The property name.
    * @param array $methods
    *  Array of methods.
    * @param bool $assign_value
    *  Determine if we need to assign the from the callback to the field. Default
    *  to FALSE.
    */
-  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
+  protected function invokeMethods(EntityMetadataWrapper $wrapper, $property_name, array $methods, $assign_value = FALSE) {
     foreach ($methods as $method) {
-      $value = $property_wrapper->value();
+      $property_wrapper = $wrapper->{$property_name};
 
+      $value = $property_wrapper->value();
       $info = $property_wrapper->info();
-      $new_value = $this->{$method}($info['name'], $value);
+
+      $new_value = $this->{$method}($info['name'], $value, $wrapper);
       if ($assign_value && $new_value != $value) {
         // Setting the fields value with the wrapper.
         $property_wrapper->set($value);
