@@ -160,7 +160,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       foreach ($public_field['validators'] as $validator) {
         $property_wrapper = $wrapper->{$property};
 
-        if ($public_field['sub_property']) {
+        if (!empty($public_field['sub_property']) && $property_wrapper->value()) {
           $property_wrapper = $property_wrapper->{$public_field['sub_property']};
         }
 
