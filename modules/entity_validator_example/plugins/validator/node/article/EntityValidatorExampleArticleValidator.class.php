@@ -22,7 +22,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   /**
    * Validate the title is at least 3 characters long.
    */
-  public function validateTitleText($field_name, $value) {
+  public function validateTitleText($field_name, $value, \EntityMetadataWrapper $wrapper) {
     if (strlen($value) < 3) {
       $this->setError($field_name, 'The @field should be at least 3 characters long.');
     }
@@ -31,7 +31,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   /**
    * Validate the description has the word "Gizra".
    */
-  public function validateBodyText($field_name, $value) {
+  public function validateBodyText($field_name, $value, \EntityMetadataWrapper $wrapper) {
     if (empty($value['value']) || strpos($value['value'], 'Drupal') === FALSE) {
       $this->setError($field_name, 'The @field should have the word "Drupal".');
     }
