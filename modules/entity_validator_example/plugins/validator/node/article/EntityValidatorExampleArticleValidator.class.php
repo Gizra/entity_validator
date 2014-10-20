@@ -13,7 +13,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function publicFieldsInfo() {
     $public_fields = parent::publicFieldsInfo();
 
-    $public_fields['title']['validators'][] = 'validateTitleText';
+    $public_fields['title']['validators'][] = array($this, 'validateBodyText');
 
     $public_fields['body'] = array(
       'required' => TRUE,

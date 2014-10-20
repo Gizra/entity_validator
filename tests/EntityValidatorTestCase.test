@@ -73,20 +73,6 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
             '@field' => 'title',
           ),
         ),
-        array(
-          'message' => 'The @field should be at least 3 characters long.',
-          'params' => array(
-            '@field' => 'title',
-          ),
-        ),
-      ),
-      'body' => array(
-        array(
-          'message' => 'The @field should have the word "Drupal".',
-          'params' => array (
-            '@field' => 'body',
-          ),
-        ),
       ),
       'field_image' => array(
         array(
@@ -113,11 +99,19 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
         ),
         array(
           'message' => 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions',
-          'params' => array (
+          'params' => array(
             '@file-name' => 'image-test.png',
             '@extension' => 'png',
             '@extensions' => 'pdf',
             '@field' => 'field_image',
+          ),
+        ),
+      ),
+      'body' => array(
+        array(
+          'message' => 'The field @field cannot be empty.',
+          'params' =>  array(
+            '@field' => 'body',
           ),
         ),
       ),
