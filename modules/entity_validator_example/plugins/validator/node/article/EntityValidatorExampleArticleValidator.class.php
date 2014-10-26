@@ -30,9 +30,9 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    * Validate the title is at least 3 characters long.
    *
    * @param string $field_name
-   *  The field name.
+   *   The field name.
    * @param mixed $value
-   *  The value of the field.
+   *   The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
    * @param EntityMetadataWrapper $property_wrapper
@@ -48,9 +48,9 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    * Validate the description has the word "Drupal".
    *
    * @param string $field_name
-   *  The field name.
+   *   The field name.
    * @param mixed $value
-   *  The value of the field.
+   *   The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
    * @param EntityMetadataWrapper $property_wrapper
