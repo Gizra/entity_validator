@@ -23,6 +23,10 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
       ),
     );
 
+    $public_fields['field_text_multiple'] = array(
+      array($this, 'validateMultipleField'),
+    );
+
     return $public_fields;
   }
 
@@ -59,6 +63,25 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function validateBodyText($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (strpos($value, 'Drupal') === FALSE) {
       $this->setError($field_name, 'The @field should have the word "Drupal".');
+    }
+  }
+
+  /**
+   * Validate the multiple field is populated with info and not left with empty
+   * values.
+   *
+   * @param string $field_name
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
+   */
+  public function validateMultipleField($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+    foreach ($wrapper as $sub_wrapper) {
+      debug($wrapper->value());
     }
   }
 }

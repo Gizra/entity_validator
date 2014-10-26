@@ -34,6 +34,24 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     );
 
     field_update_instance($instance);
+
+    // Add multiple field.
+    $field = array(
+      'field_name' => 'field_text_multiple',
+      'type' => 'text',
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'field_name' => 'field_text_multiple',
+      'widget' => array(
+        'type' => 'textfield',
+      ),
+    );
+    field_create_instance($instance);
   }
 
   /**
@@ -41,6 +59,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
    */
   function testValidate() {
     $file = $this->createImage();
+    $text_multiple[] = array('value' => 'First row');
+    $text_multiple[] = array('value' => 'Second row');
+    $text_multiple[] = array('value' => '');
     $values = array(
       'type' => 'article',
       'uid' => 0,
@@ -49,6 +70,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $handler = entity_validator_get_validator_handler('node', 'article');
     $wrapper = entity_metadata_wrapper('node', $node);
     $wrapper->field_image->set(array('fid' => $file->fid));
+    $wrapper->field_text_multiple->set();
 
     try {
       $handler->validate($node);
