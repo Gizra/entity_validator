@@ -39,13 +39,13 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $field = array(
       'field_name' => 'field_text_multiple',
       'type' => 'text',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     );
     field_create_field($field);
 
     $instance = array(
       'entity_type' => 'node',
       'bundle' => 'article',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'field_name' => 'field_text_multiple',
       'widget' => array(
         'type' => 'textfield',
@@ -58,10 +58,12 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
    * Test the validation on an entity.
    */
   function testValidate() {
+    $value[] = array('value' => 'a', 'format' => 'full_html');
+    $value[] = array('value' => 'a', 'format' => 'full_html');
+    $value[] = array('value' => 'a', 'format' => 'full_html');
+    $value[] = array();
     $file = $this->createImage();
-    $text_multiple[] = array('value' => 'First row');
-    $text_multiple[] = array('value' => 'Second row');
-    $text_multiple[] = array('value' => '');
+
     $values = array(
       'type' => 'article',
       'uid' => 0,
@@ -70,7 +72,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $handler = entity_validator_get_validator_handler('node', 'article');
     $wrapper = entity_metadata_wrapper('node', $node);
     $wrapper->field_image->set(array('fid' => $file->fid));
-    $wrapper->field_text_multiple->set();
+    $wrapper->field_text_multiple->set($value);
 
     try {
       $handler->validate($node);
