@@ -24,7 +24,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
     );
 
     $public_fields['field_text_multiple'] = array(
-      array($this, 'validateMultipleField'),
+      'validators' => array($this, 'validateMultipleField'),
     );
 
     return $public_fields;
@@ -81,7 +81,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    */
   public function validateMultipleField($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     foreach ($wrapper as $sub_wrapper) {
-      debug($wrapper->value());
+      debug($sub_wrapper->value());
     }
   }
 }
