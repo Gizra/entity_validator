@@ -24,7 +24,9 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
     );
 
     $public_fields['field_text_multiple'] = array(
-      'validators' => array($this, 'validateMultipleField'),
+      'validators' => array(
+        array($this, 'validateMultipleField'),
+      ),
     );
 
     return $public_fields;
@@ -80,8 +82,10 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    *   The wrapped property.
    */
   public function validateMultipleField($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
-    foreach ($wrapper as $sub_wrapper) {
-      debug($sub_wrapper->value());
+    foreach ($property_wrapper as $delta => $sub_wrapper) {
+      if (!$sub_wrapper->value()) {
+        $this->setError($field_name, 'The delta @delta cant be empty', array('@delta' => $delta));
+      }
     }
   }
 }
