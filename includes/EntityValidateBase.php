@@ -169,9 +169,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         if ($public_field['required']) {
           // Property is required.
           $this->isNotEmpty($property, $value, $wrapper, $property_wrapper);
+
+          // This is a multiple field and required.
+          if (method_exists($property_wrapper, 'count') && $property_wrapper->count() > 1) {
+            $this->validateMultipleFieldNotEmpty($property, $value, $wrapper, $property_wrapper);
+          }
         }
 
-        if ($value) {
+        if ($value && $validator) {
           // Property has value.
           call_user_func($validator, $property, $value, $wrapper, $property_wrapper);
         }
@@ -382,6 +387,26 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@extensions' => $settings['file_extensions'],
       );
       $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
+    }
+  }
+
+  /**
+   * Validate population of the multiple field with info.
+   *
+   * @param string $field_name
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
+   */
+  public function validateMultipleFieldNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+    foreach ($property_wrapper as $delta => $sub_wrapper) {
+      if (!$sub_wrapper->value()) {
+        $this->setError($field_name, 'The delta @delta cant be empty', array('@delta' => $delta));
+      }
     }
   }
 }

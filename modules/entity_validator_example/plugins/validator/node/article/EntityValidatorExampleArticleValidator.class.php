@@ -23,11 +23,8 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
       ),
     );
 
-    $public_fields['field_text_multiple'] = array(
-      'validators' => array(
-        array($this, 'validateMultipleField'),
-      ),
-    );
+    // todo: multiple required fields don't need to be defined.
+    $public_fields['field_text_multiple']['validators'][] = array($this, 'validateBodyText');
 
     return $public_fields;
   }
@@ -68,24 +65,4 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
     }
   }
 
-  /**
-   * Validate the multiple field is populated with info and not left with empty
-   * values.
-   *
-   * @param string $field_name
-   *   The field name.
-   * @param mixed $value
-   *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
-   *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
-   *   The wrapped property.
-   */
-  public function validateMultipleField($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
-    foreach ($property_wrapper as $delta => $sub_wrapper) {
-      if (!$sub_wrapper->value()) {
-        $this->setError($field_name, 'The delta @delta cant be empty', array('@delta' => $delta));
-      }
-    }
-  }
 }
