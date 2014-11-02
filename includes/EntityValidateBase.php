@@ -175,7 +175,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
           $this->isNotEmpty($property, $value, $wrapper, $property_wrapper);
         }
 
-        if ($value && $validator) {
+        if ($validator) {
           // Property has value.
           call_user_func($validator, $property, $value, $wrapper, $property_wrapper);
         }
@@ -233,9 +233,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * Verify the field is not empty.
    *
    * @param string $field_name
-   *  The field name.
+   *   The field name.
    * @param mixed $value
-   *  The value of the field.
+   *   The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
    * @param EntityMetadataWrapper $property_wrapper
@@ -252,9 +252,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * Check the value of the field using the entity API module.
    *
    * @param string $field_name
-   *  The field name.
+   *   The field name.
    * @param mixed $value
-   *  The value of the field.
+   *   The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
    * @param EntityMetadataWrapper $property_wrapper
@@ -290,9 +290,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * Validate the field image's by checking the image size is valid.
    *
    * @param string $field_name
-   *  The field name.
+   *   The field name.
    * @param mixed $value
-   *  The value of the field.
+   *   The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
    * @param EntityMetadataWrapper $property_wrapper
@@ -358,9 +358,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
    * Validate the file extension.
    *
    * @param string $field_name
-   *  The field name.
+   *   The field name.
    * @param mixed $value
-   *  The value of the field.
+   *   The value of the field.
    * @param EntityMetadataWrapper $wrapper
    *   The wrapped entity.
    * @param EntityMetadataWrapper $property_wrapper
