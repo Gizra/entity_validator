@@ -49,7 +49,6 @@ interface EntityValidateInterface {
    */
   public function publicFieldsInfo();
 
-
   /**
    *
    * Return the processed array with the field validation declarations.

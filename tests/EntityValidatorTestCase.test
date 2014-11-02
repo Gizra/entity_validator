@@ -59,9 +59,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
    * Test the validation on an entity.
    */
   function testValidate() {
-    $value[] = array('value' => 'a', 'format' => 'full_html');
-    $value[] = array('value' => 'a', 'format' => 'full_html');
-    $value[] = array('value' => 'a', 'format' => 'full_html');
+    $value[] = array('value' => 'First value', 'format' => 'full_html');
+    $value[] = array('value' => 'Second value', 'format' => 'full_html');
+    $value[] = array('value' => 'Third value', 'format' => 'full_html');
     $value[] = array();
     $file = $this->createImage();
 
