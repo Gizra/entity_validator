@@ -100,13 +100,17 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
     foreach ($instances_info as $instance_info) {
+      $field_info = field_info_field($instance_info['field_name']);
 
       if ($instance_info['required']) {
         // Validate field is not empty.
         $public_fields[$instance_info['field_name']]['required'] = TRUE;
-      }
 
-      $field_info = field_info_field($instance_info['field_name']);
+        // This is a multiple field and required.
+        if ($field_info['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+          $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateMultipleFieldNotEmpty');
+        }
+      }
 
       if ($field_info['type'] == 'image') {
         // Validate the image dimensions.
@@ -169,11 +173,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         if ($public_field['required']) {
           // Property is required.
           $this->isNotEmpty($property, $value, $wrapper, $property_wrapper);
-
-          // This is a multiple field and required.
-          if (method_exists($property_wrapper, 'count') && $property_wrapper->count() > 1) {
-            $this->validateMultipleFieldNotEmpty($property, $value, $wrapper, $property_wrapper);
-          }
         }
 
         if ($value && $validator) {

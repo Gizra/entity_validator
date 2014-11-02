@@ -23,9 +23,6 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
       ),
     );
 
-    // todo: multiple required fields don't need to be defined.
-    $public_fields['field_text_multiple']['validators'][] = array($this, 'validateBodyText');
-
     return $public_fields;
   }
 
