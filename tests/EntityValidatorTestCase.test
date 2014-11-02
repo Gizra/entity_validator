@@ -98,6 +98,12 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
             '@field' => 'title',
           ),
         ),
+        array(
+          'message' => 'The @field should have the word "Drupal".',
+          'params' => array(
+            '@field' => 'title',
+          ),
+        ),
       ),
       'field_image' => array(
         array(
@@ -111,7 +117,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
         array(
-          'message' => 'The width of the image(@height) is bigger then the allowed size(@min-height)',
+          'message' => 'The height of the image(@height) is bigger then the allowed size(@min-height)',
           'params' => array(
             '@width' => 40,
             '@height' => 20,
@@ -132,20 +138,26 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
-      'body' => array(
-        array(
-          'message' => 'The field @field cannot be empty.',
-          'params' =>  array(
-            '@field' => 'body',
-          ),
-        ),
-      ),
       'field_text_multiple' => array(
         array(
           'message' => 'The delta @delta cant be empty',
           'params' => array(
             '@delta' => 3,
             '@field' => 'field_text_multiple',
+          ),
+        ),
+      ),
+      'body' => array(
+        array(
+          'message' => 'The field @field cannot be empty.',
+          'params' => array(
+            '@field' => 'body',
+          ),
+        ),
+        array(
+          'message' => 'The @field should have the word "Drupal".',
+          'params' => array(
+            '@field' => 'body',
           ),
         ),
       ),

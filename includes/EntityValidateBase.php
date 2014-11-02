@@ -333,7 +333,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if ($value['height'] > $max_height) {
-        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@max-height)', $params);
+        $this->setError($field_name, 'The height of the image(@height) is bigger then the allowed size(@max-height)', $params);
       }
     }
 
@@ -349,7 +349,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if ($value['height'] < $min_height) {
-        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height)', $params);
+        $this->setError($field_name, 'The height of the image(@height) is bigger then the allowed size(@min-height)', $params);
       }
     }
   }
