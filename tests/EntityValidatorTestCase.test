@@ -140,7 +140,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
       'field_text_multiple' => array(
         array(
-          'message' => 'The delta @delta cant be empty',
+          'message' => 'The delta @delta cannot be empty.',
           'params' => array(
             '@delta' => 3,
             '@field' => 'field_text_multiple',
