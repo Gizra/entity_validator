@@ -390,7 +390,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   }
 
   /**
-   * Validate population of the multiple field with info.
+   * Validate a field with multiple cardinality is not empty.
    *
    * @param string $field_name
    *   The field name.
@@ -404,7 +404,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   public function validateMultipleFieldNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     foreach ($property_wrapper as $delta => $sub_wrapper) {
       if (!$sub_wrapper->value()) {
-        $this->setError($field_name, 'The delta @delta cant be empty', array('@delta' => $delta));
+        $this->setError($field_name, 'The delta @delta cannot be empty.', array('@delta' => $delta));
       }
     }
   }
