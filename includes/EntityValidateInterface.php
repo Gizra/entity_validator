@@ -14,7 +14,7 @@ interface EntityValidateInterface {
    * Set the bundle of the node.
    *
    * @param $bundle
-   *  The bundle machine name.
+   *   The bundle machine name.
    *
    * @return $this
    */
@@ -29,7 +29,7 @@ interface EntityValidateInterface {
    * Set the entity type.
    *
    * @param $entity
-   *  The name of the entity.
+   *   The name of the entity.
    *
    * @return $this
    */
@@ -43,20 +43,28 @@ interface EntityValidateInterface {
   public function getEntityType();
 
   /**
-   * Set the field validate and preprocess methods.
+   * Return array with the field validate and preprocess methods.
    *
-   * @return Array.
+   * @return array
    */
-  public function getFieldsInfo();
+  public function publicFieldsInfo();
+
+  /**
+   *
+   * Return the processed array with the field validation declarations.
+   *
+   * @return array
+   */
+  public function getPublicFields();
 
   /**
    * Initialize the validate process.
    *
    * @param $entity
-   *  The entity we need to validate.
+   *   The entity we need to validate.
    * @param $silent
-   *  Determine if we throw the exception or return array with the errors.
-   *  Defaults to FALSE.
+   *   Determine if we throw the exception or return array with the errors.
+   *   Defaults to FALSE.
    *
    * @throws EntityValidatorException
    */
@@ -66,23 +74,23 @@ interface EntityValidateInterface {
    * Set error.
    *
    * @param $field_name
-   *  The name of the field.
+   *   The name of the field.
    * @param $message
-   *  Set the error message without wrapping the text with t().
+   *   Set the error message without wrapping the text with t().
    * @param $params
-   *  Optional. The parameters for the t() function.
+   *   Optional. The parameters for the t() function.
    *
    * @throws Exception
-   *  When setting the error level to 1 exception will be thrown with the value
-   *  of the error.
+   *   When setting the error level to 1 exception will be thrown with the value
+   *   of the error.
    *
    * @code
-   *  $params = array(
-   *    '@value' => 'foo',
-   *    '@field' => 'date',
-   *  );
-   *  $this->setError('field_date', 'The value @value is invalid for the field @field', $params);
-   *  $this->setError('title', 'The node must have a title');
+   *   $params = array(
+   *     '@value' => 'foo',
+   *     '@field' => 'date',
+   *   );
+   *   $this->setError('field_date', 'The value @value is invalid for the field @field', $params);
+   *   $this->setError('title', 'The node must have a title');
    * @endcode
    */
   public function setError($field_name, $message, $params = '');
@@ -96,7 +104,7 @@ interface EntityValidateInterface {
    *   TRUE.
    *
    * @return Array
-   *  Return the errors which occurred during the validation process.
+   *   Return the errors which occurred during the validation process.
    */
   public function getErrors($squash = TRUE);
 
