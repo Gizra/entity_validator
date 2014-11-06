@@ -136,10 +136,12 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       // Set default values.
       $public_field += array(
         'property' => $property,
-        'sub_property',
+        'sub_property' => FALSE,
         'required' => FALSE,
-        'validators' => array($this, 'isValidValue'),
+        'validators' => array(),
       );
+
+      $public_field['validators'][] = array($this, 'isValidValue');
     }
 
     return $public_fields;
