@@ -142,6 +142,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       );
 
       $public_field['validators'][] = array($this, 'isValidValue');
+
+      if ($public_field['required']) {
+        // Property is required.
+        $public_field['validators'][] = array($this, 'isNotEmpty');
+      }
     }
 
     return $public_fields;
@@ -171,11 +176,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         }
 
         $value = $property_wrapper->value();
-
-        if ($public_field['required']) {
-          // Property is required.
-          $this->isNotEmpty($property, $value, $wrapper, $property_wrapper);
-        }
 
         if ($validator) {
           // Property has value.
@@ -277,6 +277,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     if (entity_property_verify_data_type($value, $field_type_info['property_type'])) {
       // Value is valid.
+      return;
+    }
+
+    if (is_array($value)) {
+      // Don't convert array to string.
       return;
     }
 

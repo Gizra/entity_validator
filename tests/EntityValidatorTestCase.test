@@ -93,13 +93,13 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $expected_result = array(
       'title' => array(
         array(
-          'message' => 'The field @field cannot be empty.',
+          'message' => 'The @field should have the word "Drupal".',
           'params' => array(
             '@field' => 'title',
           ),
         ),
         array(
-          'message' => 'The @field should have the word "Drupal".',
+          'message' => 'The field @field cannot be empty.',
           'params' => array(
             '@field' => 'title',
           ),
@@ -149,16 +149,24 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
       'body' => array(
         array(
-          'message' => 'The field @field cannot be empty.',
+          'message' => 'The @field should have the word "Drupal".',
           'params' => array(
             '@field' => 'body',
           ),
         ),
         array(
-          'message' => 'The @field should have the word "Drupal".',
+          'message' => 'The value @value is invalid for the field @field.',
           'params' => array(
+            '@value' => '',
             '@field' => 'body',
           ),
+        ),
+        array(
+          'message' => 'The field @field cannot be empty.',
+          'params' =>
+            array(
+              '@field' => 'body',
+            ),
         ),
       ),
     );
