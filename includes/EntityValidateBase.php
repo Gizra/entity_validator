@@ -280,17 +280,27 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
+    // Just a thought. Don't merge!
     if (is_array($value)) {
-      // Don't convert array to string.
-      return;
+      foreach ($value as $element) {
+        if (!entity_property_verify_data_type($element, $field_type_info['property_type'])) {
+          $params = array(
+            '@value' => $value,
+            '@field' => $field_name,
+          );
+
+          $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+        }
+      }
     }
+    else {
+      $params = array(
+        '@value' => (String) $value,
+        '@field' => $field_name,
+      );
 
-    $params = array(
-      '@value' => (String) $value,
-      '@field' => $field_name,
-    );
-
-    $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+      $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+    }
   }
 
   /**
