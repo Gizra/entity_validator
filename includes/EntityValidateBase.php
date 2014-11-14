@@ -136,10 +136,17 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       // Set default values.
       $public_field += array(
         'property' => $property,
-        'sub_property',
+        'sub_property' => FALSE,
         'required' => FALSE,
-        'validators' => array($this, 'isValidValue'),
+        'validators' => array(),
       );
+
+      $public_field['validators'][] = array($this, 'isValidValue');
+
+      if ($public_field['required']) {
+        // Property is required.
+        $public_field['validators'][] = array($this, 'isNotEmpty');
+      }
     }
 
     return $public_fields;
@@ -169,11 +176,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         }
 
         $value = $property_wrapper->value();
-
-        if ($public_field['required']) {
-          // Property is required.
-          $this->isNotEmpty($property, $value, $wrapper, $property_wrapper);
-        }
 
         if ($validator) {
           // Property has value.
@@ -273,7 +275,12 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
-    if (entity_property_verify_data_type($value, $field_type_info['property_type'])) {
+    // Entity metadata wrapper refer fields with multiple value as list<type>.
+    // The $field_type_info['property_type'] present the normal field type.
+    // When validating a multiple field value we need to set the value as list.
+    $type = strpos($property_wrapper->type() ,'list') === 0 ? 'list' : $field_type_info['property_type'];
+
+    if (entity_property_verify_data_type($value, $type)) {
       // Value is valid.
       return;
     }
