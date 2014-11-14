@@ -275,7 +275,12 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
-    if (entity_property_verify_data_type($value, $field_type_info['property_type'])) {
+    // Entity metadata wrapper refer fields with multiple value as list<type>.
+    // The $field_type_info['property_type'] present the normal field type.
+    // When validating a multiple field value we need to set the value as list.
+    $type = strpos($property_wrapper->type() ,'list') === 0 ? 'list' : $field_type_info['property_type'];
+
+    if (entity_property_verify_data_type($value, $type)) {
       // Value is valid.
       return;
     }
