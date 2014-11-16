@@ -19,7 +19,7 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
       'required' => TRUE,
       'sub_property' => 'value',
       'validators' => array(
-        array($this, 'validateBodyText')
+        array($this, 'validateBodyText'),
       ),
     );
 
