@@ -150,13 +150,6 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
             '@field' => 'body',
           ),
         ),
-        array(
-          'message' => 'The value @value is invalid for the field @field.',
-          'params' => array(
-            '@value' => '',
-            '@field' => 'body',
-          ),
-        ),
       ),
     );
 
