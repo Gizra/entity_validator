@@ -121,6 +121,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         // Validate the file type.
         $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateFileExtension');
       }
+
+      // Check field is valid using the wrapper.
+      $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'isValidValue');
     }
 
     return $public_fields;
@@ -141,11 +144,13 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         'validators' => array(),
       );
 
-      $public_field['validators'][] = array($this, 'isValidValue');
+      if ($public_field['validators']) {
+        $public_field['validators'][] = array($this, 'isValidValue');
 
-      if ($public_field['required']) {
-        // Property is required.
-        $public_field['validators'][] = array($this, 'isNotEmpty');
+        if ($public_field['required']) {
+          // Property is required.
+          $public_field['validators'][] = array($this, 'isNotEmpty');
+        }
       }
     }
 

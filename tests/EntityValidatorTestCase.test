@@ -53,6 +53,21 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
     );
     field_create_instance($instance);
+
+    // Add multiple field.
+    $field = array(
+      'field_name' => 'integer_single',
+      'type' => 'number_integer',
+      'cardinality' => 1,
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'field_name' => 'integer_single',
+    );
+    field_create_instance($instance);
   }
 
   /**
@@ -76,6 +91,10 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $wrapper = entity_metadata_wrapper('node', $node);
     $wrapper->field_image->set(array('fid' => $file->fid));
     $wrapper->field_text_multiple->set($value);
+
+    // We can't use the wrapper to set a wrong value, so do it directly on the
+    // node object.
+    $node->integer_single[LANGUAGE_NONE][0]['value'] = 'Not a number!';
 
     try {
       $handler->validate($node);
