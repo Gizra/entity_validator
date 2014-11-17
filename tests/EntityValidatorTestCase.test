@@ -66,6 +66,8 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $file = $this->createImage();
 
     $values = array(
+      // Two chars title.
+      'title' => 'no',
       'type' => 'article',
       'uid' => 0,
     );
@@ -93,13 +95,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $expected_result = array(
       'title' => array(
         array(
-          'message' => 'The @field should have the word "Drupal".',
-          'params' => array(
-            '@field' => 'title',
-          ),
-        ),
-        array(
-          'message' => 'The field @field cannot be empty.',
+          'message' => 'The @field should be at least 3 characters long.',
           'params' => array(
             '@field' => 'title',
           ),
@@ -161,14 +157,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
             '@field' => 'body',
           ),
         ),
-        array(
-          'message' => 'The field @field cannot be empty.',
-          'params' => array(
-            '@field' => 'body',
-          ),
-        ),
       ),
     );
+
     $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
   }
 
