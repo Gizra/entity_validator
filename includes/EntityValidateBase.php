@@ -105,11 +105,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       if ($instance_info['required']) {
         // Validate field is not empty.
         $public_fields[$instance_info['field_name']]['required'] = TRUE;
-
-        // This is a multiple field and required.
-        if ($field_info['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
-          $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateMultipleFieldNotEmpty');
-        }
       }
 
       if ($field_info['type'] == 'image') {
@@ -121,6 +116,9 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         // Validate the file type.
         $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateFileExtension');
       }
+
+      // Check field is valid using the wrapper.
+      $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'isValidValue');
     }
 
     return $public_fields;
@@ -141,11 +139,13 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         'validators' => array(),
       );
 
-      $public_field['validators'][] = array($this, 'isValidValue');
+      if (empty($public_field['validators'])) {
+        $public_field['validators'][] = array($this, 'isValidValue');
 
-      if ($public_field['required']) {
-        // Property is required.
-        $public_field['validators'][] = array($this, 'isNotEmpty');
+        if ($public_field['required']) {
+          // Property is required.
+          $public_field['validators'][] = array($this, 'isNotEmpty');
+        }
       }
     }
 
@@ -270,27 +270,13 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     }
 
     $field_type_info = field_info_field_types($field_info['type']);
-
     if (empty($field_type_info['property_type'])) {
       return;
     }
 
-    // Entity metadata wrapper refer fields with multiple value as list<type>.
-    // The $field_type_info['property_type'] present the normal field type.
-    // When validating a multiple field value we need to set the value as list.
-    $type = strpos($property_wrapper->type() ,'list') === 0 ? 'list' : $field_type_info['property_type'];
-
-    if (entity_property_verify_data_type($value, $type)) {
-      // Value is valid.
-      return;
+    if (!$wrapper->{$field_name}->validate($value)) {
+      $this->setError($field_name, 'Invalid value for the field @field.');
     }
-
-    $params = array(
-      '@value' => (String) $value,
-      '@field' => $field_name,
-    );
-
-    $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
   }
 
   /**
@@ -393,26 +379,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@extensions' => $settings['file_extensions'],
       );
       $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
-    }
-  }
-
-  /**
-   * Validate a field with multiple cardinality is not empty.
-   *
-   * @param string $field_name
-   *   The field name.
-   * @param mixed $value
-   *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
-   *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
-   *   The wrapped property.
-   */
-  public function validateMultipleFieldNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
-    foreach ($property_wrapper as $delta => $sub_wrapper) {
-      if (!$sub_wrapper->value()) {
-        $this->setError($field_name, 'The delta @delta cannot be empty.', array('@delta' => $delta));
-      }
     }
   }
 }
