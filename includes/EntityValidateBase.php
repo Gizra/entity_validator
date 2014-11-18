@@ -105,11 +105,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       if ($instance_info['required']) {
         // Validate field is not empty.
         $public_fields[$instance_info['field_name']]['required'] = TRUE;
-
-        // This is a multiple field and required.
-        if ($field_info['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
-          $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateMultipleFieldNotEmpty');
-        }
       }
 
       if ($field_info['type'] == 'image') {
@@ -144,7 +139,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         'validators' => array(),
       );
 
-      if ($public_field['validators']) {
+      if (empty($public_field['validators'])) {
         $public_field['validators'][] = array($this, 'isValidValue');
 
         if ($public_field['required']) {
@@ -384,26 +379,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
         '@extensions' => $settings['file_extensions'],
       );
       $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
-    }
-  }
-
-  /**
-   * Validate a field with multiple cardinality is not empty.
-   *
-   * @param string $field_name
-   *   The field name.
-   * @param mixed $value
-   *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
-   *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
-   *   The wrapped property.
-   */
-  public function validateMultipleFieldNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
-    foreach ($property_wrapper as $delta => $sub_wrapper) {
-      if (!$sub_wrapper->value()) {
-        $this->setError($field_name, 'The delta @delta cannot be empty.', array('@delta' => $delta));
-      }
     }
   }
 }

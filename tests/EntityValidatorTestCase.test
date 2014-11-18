@@ -35,26 +35,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
     field_update_instance($instance);
 
-    // Add multiple field.
-    $field = array(
-      'field_name' => 'field_text_multiple',
-      'type' => 'text',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-    );
-    field_create_field($field);
-
-    $instance = array(
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'field_name' => 'field_text_multiple',
-      'required' => TRUE,
-      'widget' => array(
-        'type' => 'textfield',
-      ),
-    );
-    field_create_instance($instance);
-
-    // Add multiple field.
+    // Add integer field.
     $field = array(
       'field_name' => 'integer_single',
       'type' => 'number_integer',
@@ -74,23 +55,18 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
    * Test the validation on an entity.
    */
   function testValidate() {
-    $value[] = array('value' => 'First value');
-    $value[] = array('value' => 'Second value');
-    $value[] = array('value' => 'Third value');
-    $value[] = array();
-    $file = $this->createImage();
-
     $values = array(
       // Two chars title.
       'title' => 'no',
       'type' => 'article',
-      'uid' => 0,
     );
     $node = entity_create('node', $values);
     $handler = entity_validator_get_validator_handler('node', 'article');
     $wrapper = entity_metadata_wrapper('node', $node);
+
+
+    $file = $this->createImage();
     $wrapper->field_image->set(array('fid' => $file->fid));
-    $wrapper->field_text_multiple->set($value);
 
     // We can't use the wrapper to set a wrong value, so do it directly on the
     // node object.
@@ -153,15 +129,6 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
-      'field_text_multiple' => array(
-        array(
-          'message' => 'The delta @delta cannot be empty.',
-          'params' => array(
-            '@delta' => 3,
-            '@field' => 'field_text_multiple',
-          ),
-        ),
-      ),
       'body' => array(
         array(
           'message' => 'The @field should have the word "Drupal".',
@@ -170,9 +137,27 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
+      'integer_single' => array (
+        array (
+          'message' => 'Invalid value for the field @field.',
+          'params' =>
+            array (
+              '@field' => 'integer_single',
+            ),
+        ),
+      ),
     );
 
-    $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
+    $field_names = array(
+      'title',
+      'body',
+      'field_image',
+      'integer_single',
+    );
+
+    foreach ($field_names as $field_name) {
+      $this->assertEqual($result[$field_name], $expected_result[$field_name], format_string('The silent mode returned the expected results for field @field.', array('@field' => $field_name)));
+    }
   }
 
   /**
