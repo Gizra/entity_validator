@@ -61,9 +61,9 @@ function entity_validator_get_validator_plugin($plugin_name) {
  * Return the validation handler based on entity type and bundle.
  *
  * @param $entity_type
- *  The entity type.
+ *   The entity type.
  * @param $bundle
- *  The bundle name.
+ *   The bundle name.
  *
  * @return EntityValidateInterface | NULL
  *  The handler object if found, or NULL.
