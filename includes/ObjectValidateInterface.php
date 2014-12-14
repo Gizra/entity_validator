@@ -11,14 +11,6 @@ interface ObjectValidateInterface {
   public function __construct($plugin);
 
   /**
-   * Load the schema information.
-   *
-   * @param $name
-   *   The name of the schema.
-   */
-  public function loadSchema($name);
-
-  /**
    * Return array with the field validate methods.
    *
    * @return array

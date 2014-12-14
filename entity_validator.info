@@ -6,6 +6,8 @@ dependencies[] = entity
 
 
 ; Handlers
+files[] = includes/ObjectValidateBase.php
+files[] = includes/ObjectValidateInterface.php
 files[] = includes/EntityValidateBase.php
 files[] = includes/EntityValidateInterface.php
 

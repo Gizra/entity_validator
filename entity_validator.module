@@ -79,3 +79,23 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
   $handler = new $class($plugin);
   return $handler;
 }
+
+/**
+ * Return the validation handler for schema validator.
+ *
+ * @param $plugin_name
+ *   The name of the validator.
+ *
+ * @return ObjectValidateInterface | NULL
+ *   The validator object.
+ */
+function entity_validator_get_schema_validator($plugin_name) {
+  $plugin = entity_validator_get_validator_plugin($plugin_name);
+
+  if (!$class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class')) {
+    return NULL;
+  }
+
+  $handler = new $class($plugin);
+  return $handler;
+}
