@@ -178,7 +178,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     }
 
     $result = $validator->validate($object, TRUE);
-    $this->assertFalse($result, 'Validate a custom schema in a silent mode did not throw an exception');
+    $this->assertFalse($result, 'Validate a custom schema in a silent mode did not throw an exception.');
 
     // Verify we got right errors.
     $results = $validator->getErrors(FALSE);
@@ -203,7 +203,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
     $field_names = array(
       'title',
-      'created'
+      'created',
     );
 
     foreach ($field_names as $field_name) {

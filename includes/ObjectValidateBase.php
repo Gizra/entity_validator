@@ -1,6 +1,6 @@
 <?php
 
-class ObjectValidateBase implements ObjectValidateInterface {
+abstract class ObjectValidateBase implements ObjectValidateInterface {
 
   /**
    * @var Array
@@ -216,7 +216,7 @@ class ObjectValidateBase implements ObjectValidateInterface {
     $fields = $this->getPublicFields();
 
     if (($type = $fields[$property]['type']) == 'unknown') {
-      // The field type is unknonw. Don't validate the value.
+      // The field type is unknown. Don't validate the value.
       return;
     }
 
@@ -245,6 +245,20 @@ class ObjectValidateBase implements ObjectValidateInterface {
     if (empty($value)) {
       $params = array('@property' => $property);
       $this->setError($property, 'The field @property cannot be empty.', $params);
+    }
+  }
+
+  /**
+   * Validate the unix time stamp format.
+   *
+   * @param string $property
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   */
+  public function validateUnixTimeStamp($property, $value) {
+    if ($value < 7200) {
+      $this->setError($property, 'The @property property should be a valid unix time stamp.');
     }
   }
 }
