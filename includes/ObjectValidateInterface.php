@@ -40,7 +40,7 @@ interface ObjectValidateInterface {
   /**
    * Set error.
    *
-   * @param $property_name
+   * @param $property
    *   The name of the property.
    * @param $message
    *   Set the error message without wrapping the text with t().
@@ -60,7 +60,7 @@ interface ObjectValidateInterface {
    *   $this->setError('uid', 'The uid must be integer');
    * @endcode
    */
-  public function setError($property_name, $message, $params = '');
+  public function setError($property, $message, $params = '');
 
   /**
    * Retrieve the errors.

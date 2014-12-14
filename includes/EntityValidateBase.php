@@ -189,7 +189,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     }
 
     if ($silent) {
-      // Don't throw an error, and just indicate validation failed.
+      // Don't throw an error, just indicate validation failed.
       return FALSE;
     }
 

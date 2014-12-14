@@ -82,6 +82,7 @@ class ObjectValidateBase implements ObjectValidateInterface {
       $fields[$field] = array(
         'type' => $this->getRealType($info['type']),
         'required' => $info['not null'],
+        'property' => $field,
       );
 
       if (!empty($info['size'])) {
@@ -106,8 +107,8 @@ class ObjectValidateBase implements ObjectValidateInterface {
       'int' => 'int',
       'numeric' => 'int',
       'serial' => 'int',
-      'text' => 'text',
-      'varchar' => 'text',
+      'text' => 'string',
+      'varchar' => 'string',
     );
 
     return $types[$type];
@@ -121,10 +122,10 @@ class ObjectValidateBase implements ObjectValidateInterface {
 
     foreach ($public_fields as $property => &$public_field) {
       // Adding type validation.
-      $public_field['callbacks'][] = array($this, 'validateType');
+      $public_field['validators'][] = array($this, 'validateType');
 
       if ($public_field['required']) {
-        $public_field['callbacks'][] = array($this, 'isNotEmpty');
+        $public_field['validators'][] = array($this, 'isNotEmpty');
       }
     }
 
@@ -142,15 +143,39 @@ class ObjectValidateBase implements ObjectValidateInterface {
       return TRUE;
     }
 
-    dpm($public_fields);
+    // Collect the properties callbacks.
+    foreach ($public_fields as $public_field) {
+      $property = $public_field['property'];
+
+      foreach ($public_field['validators'] as $validator) {
+        $value = $object->{$property};
+
+        if ($validator) {
+          // Property has value.
+          call_user_func($validator, $property, $value);
+        }
+      }
+    }
+
+    if (!$errors = $this->getErrors()) {
+      return TRUE;
+    }
+
+    if ($silent) {
+      // Don't throw an error, just indicate validation failed.
+      return FALSE;
+    }
+
+    $params = array('@errors' => $errors);
+    throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setError($field_name, $message, $params = array()) {
-    $params['@field'] = $field_name;
-    $this->errors[$field_name][] = array('message' => $message, 'params' => $params);
+  public function setError($property, $message, $params = array()) {
+    $params['@property'] = $property;
+    $this->errors[$property][] = array('message' => $message, 'params' => $params);
   }
 
   /**
@@ -177,5 +202,49 @@ class ObjectValidateBase implements ObjectValidateInterface {
    */
   public function clearErrors() {
     $this->errors = array();
+  }
+
+  /**
+   * Verify the field value.
+   *
+   * @param string $property
+   *   The property name.
+   * @param mixed $value
+   *   The value of the property.
+   */
+  public function validateType($property, $value) {
+    $fields = $this->getPublicFields();
+
+    if (($type = $fields[$property]['type']) == 'unknown') {
+      // The field type is unknonw. Don't validate the value.
+      return;
+    }
+
+    if (!function_exists('is_' . $type)) {
+      return;
+    }
+
+    if (!call_user_func('is_' . $type, $value)) {
+      $params = array(
+        '@value' => $value,
+        '@property' => $property,
+      );
+      $this->setError($property, 'The @value is not matching the @property type.', $params);
+    }
+  }
+
+  /**
+   * Verify the field is not empty.
+   *
+   * @param string $property
+   *   The property name.
+   * @param mixed $value
+   *   The value of the property.
+   */
+  protected function isNotEmpty($property, $value) {
+    if (empty($value)) {
+      $params = array('@property' => $property);
+      $this->setError($property, 'The field @property cannot be empty.', $params);
+    }
   }
 }
