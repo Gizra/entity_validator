@@ -54,21 +54,61 @@ class ObjectValidateBase implements ObjectValidateInterface {
    * {@inheritdoc}
    */
   public function publicFieldsInfo() {
-    // TODO: Implement publicFieldsInfo() method.
+    $schema = $this->getSchema();
+    $fields = array();
+
+    foreach ($schema['fields'] as $field => $info) {
+      $fields[$field] = array(
+        'type' => $this->getRealType($info['type']),
+      );
+    }
+    
+    return $fields;
+  }
+
+  /**
+   * Map the type defined in the hook_schema to php data type.
+   *
+   * @param $type
+   *   The type defined in the hook_schema. i.e: serial, int.
+   */
+  public function getRealType($type) {
+    $types = array(
+      'blob' => 'unknown',
+      'char' => 'unknown',
+      'float' => 'float',
+      'int' => 'int',
+      'numeric' => 'int',
+      'serial' => 'int',
+      'text' => 'text',
+      'varchar' => 'text',
+    );
+
+    return $types[$type];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPublicFields() {
-    // TODO: Implement getPublicFields() method.
+    $public_fields = $this->publicFieldsInfo();
+    foreach ($public_fields as $property => &$public_field) {
+
+    }
+
+    return $public_fields;
   }
 
   /**
    * {@inheritdoc}
    */
   public function validate($object, $silent = FALSE) {
-    // TODO: Implement validate() method.
+    // Clear any previous error messages.
+    $this->clearErrors();
+
+    if (!$public_fields = $this->getPublicFields()) {
+      return TRUE;
+    }
   }
 
   /**
@@ -89,6 +129,6 @@ class ObjectValidateBase implements ObjectValidateInterface {
    * {@inheritdoc}
    */
   public function clearErrors() {
-    // TODO: Implement clearErrors() method.
+    $this->errors = array();
   }
 }
