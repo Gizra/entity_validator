@@ -81,7 +81,7 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
     foreach ($schema['fields'] as $field => $info) {
       $fields[$field] = array(
         'type' => $this->getRealType($info['type']),
-        'required' => $info['not null'],
+        'required' => $info['not null'] && $info['type'] != 'serial',
         'property' => $field,
       );
 
@@ -152,7 +152,7 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
 
         if ($validator) {
           // Property has value.
-          call_user_func($validator, $property, $value);
+          call_user_func($validator, $property, $value, $object);
         }
       }
     }
@@ -211,8 +211,10 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
    *   The property name.
    * @param mixed $value
    *   The value of the property.
+   * @param \stdClass $object
+   *   The object we need to validate.
    */
-  public function validateType($property, $value) {
+  public function validateType($property, $value, $object) {
     $fields = $this->getPublicFields();
 
     if (($type = $fields[$property]['type']) == 'unknown') {
@@ -240,8 +242,10 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
    *   The property name.
    * @param mixed $value
    *   The value of the property.
+   * @param \stdClass $object
+   *   The object we need to validate.
    */
-  protected function isNotEmpty($property, $value) {
+  protected function isNotEmpty($property, $value, $object) {
     if (empty($value)) {
       $params = array('@property' => $property);
       $this->setError($property, 'The field @property cannot be empty.', $params);
@@ -255,8 +259,10 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
    *   The field name.
    * @param mixed $value
    *   The value of the field.
+   * @param \stdClass $object
+   *   The object we need to validate.
    */
-  public function validateUnixTimeStamp($property, $value) {
+  public function validateUnixTimeStamp($property, $value, $object) {
     if ($value < 7200) {
       $this->setError($property, 'The @property property should be a valid unix time stamp.');
     }

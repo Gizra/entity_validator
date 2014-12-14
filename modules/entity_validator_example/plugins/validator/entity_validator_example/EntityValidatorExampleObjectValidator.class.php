@@ -21,8 +21,10 @@ class EntityValidatorExampleObjectValidator extends ObjectValidateBase {
    *   The field name.
    * @param mixed $value
    *   The value of the field.
+   * @param \stdClass $object
+   *   The object we need to validate.
    */
-  public function validateTitleText($property, $value) {
+  public function validateTitleText($property, $value, $object) {
     if (strlen($value) < 3) {
       $this->setError($property, 'The @property property should be at least 3 characters long.');
     }
