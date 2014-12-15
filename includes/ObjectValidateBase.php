@@ -124,7 +124,7 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
       // Adding type validation.
       $public_field['validators'][] = array($this, 'validateType');
 
-      if ($public_field['required']) {
+      if (!empty($public_field['required']) && $public_field['required']) {
         $public_field['validators'][] = array($this, 'isNotEmpty');
       }
     }
@@ -148,7 +148,7 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
       $property = $public_field['property'];
 
       foreach ($public_field['validators'] as $validator) {
-        $value = $object->{$property};
+        $value = !empty($object->{$property}) ? $object->{$property} : NULL;
 
         if ($validator) {
           // Property has value.
@@ -216,6 +216,10 @@ abstract class ObjectValidateBase implements ObjectValidateInterface {
    */
   public function validateType($property, $value, $object) {
     $fields = $this->getPublicFields();
+
+    if (empty($fields[$property]['type'])) {
+      return;
+    }
 
     if (($type = $fields[$property]['type']) == 'unknown') {
       // The field type is unknown. Don't validate the value.
