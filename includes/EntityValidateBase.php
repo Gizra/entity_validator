@@ -131,22 +131,20 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $public_fields = $this->publicFieldsInfo();
     foreach ($public_fields as $property => &$public_field) {
 
-      // Set default values.
-      $public_field += array(
-        'property' => $property,
-        'sub_property' => FALSE,
-        'required' => FALSE,
-        'validators' => array(),
-      );
+      $definition = FieldsInfo::setFields($public_field)
+        ->setValidator($this)
+        ->setProperty($property);
 
       if (empty($public_field['validators'])) {
-        $public_field['validators'][] = array($this, 'isValidValue');
+        $definition->addCallback('isValidValue');
 
         if ($public_field['required']) {
           // Property is required.
-          $public_field['validators'][] = array($this, 'isNotEmpty');
+          $definition->addCallback('isNotEmpty');
         }
       }
+
+      $public_field = $definition->getDefinition();
     }
 
     return $public_fields;
