@@ -93,14 +93,14 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
-      FieldsInfo::setFields($public_fields[$keys['label']])->setRequired();
+      FieldsInfo::setFieldInfo($public_fields[$keys['label']])->setRequired();
     }
 
     $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
     foreach ($instances_info as $instance_info) {
       $field_info = field_info_field($instance_info['field_name']);
 
-      $fields_handler = FieldsInfo::setFields($public_fields[$instance_info['field_name']])
+      $fields_handler = FieldsInfo::setFieldInfo($public_fields[$instance_info['field_name']])
         ->setValidator($this);
 
       if ($instance_info['required']) {
@@ -132,7 +132,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $public_fields = $this->publicFieldsInfo();
     foreach ($public_fields as $property => &$public_field) {
 
-      $field = FieldsInfo::setFields($public_field)
+      $field = FieldsInfo::setFieldInfo($public_field)
         ->setValidator($this)
         ->setProperty($property);
 
