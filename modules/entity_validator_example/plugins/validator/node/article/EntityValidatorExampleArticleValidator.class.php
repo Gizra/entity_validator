@@ -13,16 +13,14 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
   public function publicFieldsInfo() {
     $public_fields = parent::publicFieldsInfo();
 
-    $public_fields['title'] = FieldsInfo::setFields($public_fields['title'])
+    FieldsInfo::setFields($public_fields['title'])
       ->setValidator($this)
-      ->addCallback('validateTitleText')
-      ->getDefinition();
+      ->addCallback('validateTitleText');
 
-    $public_fields['body'] = FieldsInfo::setFields(array())
+    FieldsInfo::setFields($public_fields['body'])
       ->setSubProperty('body')
       ->setValidator($this)
-      ->addCallback('validateBodyText')
-      ->getDefinition();
+      ->addCallback('validateBodyText');
 
     return $public_fields;
   }

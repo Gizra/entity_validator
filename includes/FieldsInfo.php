@@ -9,17 +9,12 @@ class FieldsInfo {
   protected $validator;
   protected $definition = array();
 
-  static public function setFields($public_field = array()) {
+  static public function setFields(&$public_field = array()) {
     return new static($public_field);
   }
 
-  function __construct($public_field = array()) {
-    $this->definition += array(
-      'sub_property' => FALSE,
-      'required' => FALSE,
-      'validators' => array(),
-    );
-    return $this;
+  public function __construct(&$public_field = array()) {
+    $this->definition =& $public_field;
   }
 
   public function setValidator($validator) {
@@ -47,16 +42,14 @@ class FieldsInfo {
       $object = $this->validator;
     }
 
-    $this->definition['validators'][] = array($callback, $object);
+    $this->definition['validators'][] = array($object, $callback);
     return $this;
   }
 
-  public function __sleep() {
-    // Why no working?!
-    return $this->definition;
-  }
-
-  public function getDefinition() {
-    return $this->definition;
+  public function setCallbacks($callbacks = array()) {
+    foreach ($callbacks as $callback) {
+      $this->addCallback($callback);
+    }
+    return $this;
   }
 }

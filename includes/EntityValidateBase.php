@@ -93,32 +93,33 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
-      $public_fields[$keys['label']] = array(
-        'required' => TRUE,
-      );
+      FieldsInfo::setFields($public_fields[$keys['label']])->setRequired();
     }
 
     $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
     foreach ($instances_info as $instance_info) {
       $field_info = field_info_field($instance_info['field_name']);
 
+      $fields_handler = FieldsInfo::setFields($public_fields[$instance_info['field_name']])
+        ->setValidator($this);
+
       if ($instance_info['required']) {
         // Validate field is not empty.
-        $public_fields[$instance_info['field_name']]['required'] = TRUE;
+        $fields_handler->setRequired();
       }
 
       if ($field_info['type'] == 'image') {
         // Validate the image dimensions.
-        $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateImageSize');
+        $fields_handler->addCallback('validateImageSize');
       }
 
       if (in_array($field_info['type'], array('image', 'file'))) {
         // Validate the file type.
-        $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'validateFileExtension');
+        $fields_handler->addCallback('validateFileExtension');
       }
 
       // Check field is valid using the wrapper.
-      $public_fields[$instance_info['field_name']]['validators'][] = array($this, 'isValidValue');
+      $fields_handler->addCallback('isValidValue');
     }
 
     return $public_fields;
@@ -131,20 +132,18 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $public_fields = $this->publicFieldsInfo();
     foreach ($public_fields as $property => &$public_field) {
 
-      $definition = FieldsInfo::setFields($public_field)
+      $field = FieldsInfo::setFields($public_field)
         ->setValidator($this)
         ->setProperty($property);
 
       if (empty($public_field['validators'])) {
-        $definition->addCallback('isValidValue');
+        $field->addCallback('isValidValue');
 
         if ($public_field['required']) {
           // Property is required.
-          $definition->addCallback('isNotEmpty');
+          $field->addCallback('isNotEmpty');
         }
       }
-
-      $public_field = $definition->getDefinition();
     }
 
     return $public_fields;
