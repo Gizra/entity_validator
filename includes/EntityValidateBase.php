@@ -100,8 +100,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     foreach ($instances_info as $instance_info) {
       $field_info = field_info_field($instance_info['field_name']);
 
-      $fields_handler = FieldsInfo::setFieldInfo($public_fields[$instance_info['field_name']])
-        ->setValidator($this);
+      $fields_handler = FieldsInfo::setFieldInfo($public_fields[$instance_info['field_name']], $this);
 
       if ($instance_info['required']) {
         // Validate field is not empty.
@@ -132,8 +131,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $public_fields = $this->publicFieldsInfo();
     foreach ($public_fields as $property => &$public_field) {
 
-      $field = FieldsInfo::setFieldInfo($public_field)
-        ->setValidator($this)
+      $field = FieldsInfo::setFieldInfo($public_field, $this)
         ->setProperty($property);
 
       if (empty($public_field['validators'])) {
@@ -378,4 +376,5 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
     }
   }
+
 }

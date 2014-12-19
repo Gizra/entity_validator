@@ -32,10 +32,12 @@ class FieldsInfo {
   /**
    * @param array $public_field
    *   The field definition set the publicFieldsInfo().
+   * @param EntityValidateInterface $validator
+   *   Optional. The validator object.
    * @return FieldsInfo
    */
-  static public function setFieldInfo(&$public_field = array()) {
-    return new static($public_field);
+  static public function setFieldInfo(&$public_field = array(), \EntityValidateInterface $validator = NULL) {
+    return new static($public_field, $validator);
   }
 
   /**
@@ -43,9 +45,15 @@ class FieldsInfo {
    *
    * @param array $public_field
    *   The field definition set the publicFieldsInfo().
+   * @param EntityValidateInterface $validator
+   *   Optional. The validator object.
    */
-  public function __construct(&$public_field = array()) {
+  public function __construct(&$public_field = array(), \EntityValidateInterface $validator = NULL) {
     $this->definition =& $public_field;
+
+    if ($validator) {
+      $this->setValidator($validator);
+    }
   }
 
   /**
