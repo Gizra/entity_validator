@@ -8,6 +8,7 @@ dependencies[] = entity
 ; Handlers
 files[] = includes/EntityValidateBase.php
 files[] = includes/EntityValidateInterface.php
+files[] = includes/FieldsInfo.php
 
 ; Exceptions
 files[] = exceptions/EntityValidatorException.php
