@@ -22,9 +22,16 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * List of fields keyed by machine name and valued with the field's value.
    *
-   * @var Array.
+   * Array with the optional values:
+   * - "property": The entity property (e.g. "title", "nid").
+   * - "sub_property": A sub property name of a property to take from it the
+   *   content. This can be used for example on a text field with filtered text
+   *   input format where we would need to do $wrapper->body->value->value().
+   *   Defaults to FALSE.
+   *
+   * @var array
    */
-  protected $fields = array();
+  protected $publicFields = array();
 
   /**
    * Store the errors in case the error set to 0.
@@ -79,43 +86,65 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldsInfo() {
-    $fields = array();
+  public function publicFieldsInfo() {
+    $public_fields = array();
     $entity_info = entity_get_info($this->entityType);
     $keys = $entity_info['entity keys'];
 
     // When the entity has a label key we need to verify it's not empty.
     if (!empty($keys['label'])) {
-      $fields[$keys['label']] = array(
-        'validators' => array(
-          'isNotEmpty',
-        ),
-      );
+      FieldsInfo::setFieldInfo($public_fields[$keys['label']])->setRequired();
     }
 
     $instances_info = field_info_instances($this->getEntityType(), $this->getBundle());
-
     foreach ($instances_info as $instance_info) {
+      $field_info = field_info_field($instance_info['field_name']);
+
+      $fields_handler = FieldsInfo::setFieldInfo($public_fields[$instance_info['field_name']], $this);
 
       if ($instance_info['required']) {
         // Validate field is not empty.
-        $fields[$instance_info['field_name']]['validators'][] = 'isNotEmpty';
+        $fields_handler->setRequired();
       }
-
-      $field_info = field_info_field($instance_info['field_name']);
 
       if ($field_info['type'] == 'image') {
         // Validate the image dimensions.
-        $fields[$instance_info['field_name']]['validators'][] = 'validateImageSize';
+        $fields_handler->addCallback('validateImageSize');
       }
 
       if (in_array($field_info['type'], array('image', 'file'))) {
         // Validate the file type.
-        $fields[$instance_info['field_name']]['validators'][] = 'validateFileExtension';
+        $fields_handler->addCallback('validateFileExtension');
+      }
+
+      // Check field is valid using the wrapper.
+      $fields_handler->addCallback('isValidValue');
+    }
+
+    return $public_fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPublicFields() {
+    $public_fields = $this->publicFieldsInfo();
+    foreach ($public_fields as $property => &$public_field) {
+
+      $field = FieldsInfo::setFieldInfo($public_field, $this)
+        ->setProperty($property);
+
+      if (empty($public_field['validators'])) {
+        $field->addCallback('isValidValue');
+
+        if ($public_field['required']) {
+          // Property is required.
+          $field->addCallback('isNotEmpty');
+        }
       }
     }
 
-    return $fields;
+    return $public_fields;
   }
 
   /**
@@ -124,30 +153,29 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   public function validate($entity, $silent = FALSE) {
     // Clear any previous error messages.
     $this->clearErrors();
-    if (!$fields_info = $this->getFieldsInfo()) {
+    if (!$public_fields = $this->getPublicFields()) {
       return TRUE;
     }
 
     $wrapper = entity_metadata_wrapper($this->entityType, $entity);
 
     // Collect the fields callbacks.
-    foreach ($fields_info as $field_name => $info) {
-      $property = isset($info['property']) ? $info['property'] : $field_name;
+    foreach ($public_fields as $public_field) {
+      $property = $public_field['property'];
 
-      if (!empty($info['preprocess'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['preprocess'], TRUE);
-      }
+      foreach ($public_field['validators'] as $validator) {
+        $property_wrapper = $wrapper->{$property};
 
-      // Loading default value of the fields and the instance.
-      $field_info = field_info_field($field_name);
-      $field_type_info = field_info_field_types($field_info['type']);
+        if (!empty($public_field['sub_property']) && $property_wrapper->value()) {
+          $property_wrapper = $property_wrapper->{$public_field['sub_property']};
+        }
 
-      if (isset($field_type_info['property_type']) && $wrapper->{$property}->value()) {
-        $this->isValidValue($field_name, $wrapper->{$property}->value(), $field_type_info['property_type']);
-      }
+        $value = $property_wrapper->value();
 
-      if (!empty($info['validators'])) {
-        $this->invokeMethods($wrapper->{$property}, $info['validators']);
+        if ($validator) {
+          // Property has value.
+          call_user_func($validator, $property, $value, $wrapper, $property_wrapper);
+        }
       }
     }
 
@@ -162,31 +190,6 @@ abstract class EntityValidateBase implements EntityValidateInterface {
 
     $params = array('@errors' => $errors);
     throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
-  }
-
-  /**
-   * Preprocess the field. This is useful when we need to alter a field before
-   * the validation process.
-   *
-   * @param \EntityMetadataWrapper $property_wrapper
-   *  The property wrapper.
-   * @param array $methods
-   *  Array of methods.
-   * @param bool $assign_value
-   *  Determine if we need to assign the from the callback to the field. Default
-   *  to FALSE.
-   */
-  protected function invokeMethods(EntityMetadataWrapper $property_wrapper, array $methods, $assign_value = FALSE) {
-    foreach ($methods as $method) {
-      $value = $property_wrapper->value();
-
-      $info = $property_wrapper->info();
-      $new_value = $this->{$method}($info['name'], $value);
-      if ($assign_value && $new_value != $value) {
-        // Setting the fields value with the wrapper.
-        $property_wrapper->set($value);
-      }
-    }
   }
 
   /**
@@ -226,57 +229,64 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * Verify the field is not empty.
    *
-   * @param $field_name
-   *  The field name.
-   * @param $value
-   *  The value of the field.
-   *
-   * @return boolean
+   * @param string $field_name
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function isNotEmpty($field_name, $value) {
+  protected function isNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
-      $params = array(
-        '@field' => $field_name,
-      );
-
+      $params = array('@field' => $field_name);
       $this->setError($field_name, 'The field @field cannot be empty.', $params);
     }
   }
 
   /**
-   * Special validate callback: usually all the validator have two arguments,
-   * value and field. This validate method check the value of the field using
-   * the entity API module.
+   * Check the value of the field using the entity API module.
    *
-   * @param $field_name
-   *  The field name.
-   * @param $value
-   *  The value of the field.
-   * @param $type
-   *  The type of the field.
-   *
-   * @return boolean
+   * @param string $field_name
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function isValidValue($field_name, $value, $type) {
-    if (!entity_property_verify_data_type($value, $type)) {
-      $params = array(
-        '@value' => (String) $value,
-        '@field' => $field_name,
-      );
+  protected function isValidValue($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+    // Loading default value of the fields and the instance.
+    if (!$field_info = field_info_field($field_name)) {
+      // Not a field.
+      return;
+    }
 
-      $this->setError($field_name, 'The value @value is invalid for the field @field.', $params);
+    $field_type_info = field_info_field_types($field_info['type']);
+    if (empty($field_type_info['property_type'])) {
+      return;
+    }
+
+    if (!$wrapper->{$field_name}->validate($value)) {
+      $this->setError($field_name, 'Invalid value for the field @field.');
     }
   }
 
   /**
-   * Validate the field image: Check the image is the correct size.
+   * Validate the field image's by checking the image size is valid.
    *
-   * @param $field_name
-   *  The field name.
-   * @param $value
-   *  The value of the field.
+   * @param string $field_name
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function validateImageSize($field_name, $value) {
+  protected function validateImageSize($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       return;
     }
@@ -311,7 +321,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if ($value['height'] > $max_height) {
-        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@max-height)', $params);
+        $this->setError($field_name, 'The height of the image(@height) is bigger then the allowed size(@max-height)', $params);
       }
     }
 
@@ -327,20 +337,24 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       }
 
       if ($value['height'] < $min_height) {
-        $this->setError($field_name, 'The width of the image(@height) is bigger then the allowed size(@min-height)', $params);
+        $this->setError($field_name, 'The height of the image(@height) is bigger then the allowed size(@min-height)', $params);
       }
     }
   }
 
   /**
-   * Validating the file extension.
+   * Validate the file extension.
    *
-   * @param $field_name
-   *  The field name.
-   * @param $value
-   *  The value of the field.
+   * @param string $field_name
+   *   The field name.
+   * @param mixed $value
+   *   The value of the field.
+   * @param EntityMetadataWrapper $wrapper
+   *   The wrapped entity.
+   * @param EntityMetadataWrapper $property_wrapper
+   *   The wrapped property.
    */
-  public function validateFileExtension($field_name, $value) {
+  protected function validateFileExtension($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       return;
     }
@@ -362,4 +376,5 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
     }
   }
+
 }

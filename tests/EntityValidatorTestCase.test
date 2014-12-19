@@ -34,21 +34,43 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     );
 
     field_update_instance($instance);
+
+    // Add integer field.
+    $field = array(
+      'field_name' => 'integer_single',
+      'type' => 'number_integer',
+      'cardinality' => 1,
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'field_name' => 'integer_single',
+    );
+    field_create_instance($instance);
   }
 
   /**
    * Test the validation on an entity.
    */
   function testValidate() {
-    $file = $this->createImage();
     $values = array(
+      // Two chars title.
+      'title' => 'no',
       'type' => 'article',
-      'uid' => 0,
     );
     $node = entity_create('node', $values);
     $handler = entity_validator_get_validator_handler('node', 'article');
     $wrapper = entity_metadata_wrapper('node', $node);
+
+
+    $file = $this->createImage();
     $wrapper->field_image->set(array('fid' => $file->fid));
+
+    // We can't use the wrapper to set a wrong value, so do it directly on the
+    // node object.
+    $node->integer_single[LANGUAGE_NONE][0]['value'] = 'Not a number!';
 
     try {
       $handler->validate($node);
@@ -68,23 +90,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     $expected_result = array(
       'title' => array(
         array(
-          'message' => 'The field @field cannot be empty.',
-          'params' => array(
-            '@field' => 'title',
-          ),
-        ),
-        array(
           'message' => 'The @field should be at least 3 characters long.',
           'params' => array(
             '@field' => 'title',
-          ),
-        ),
-      ),
-      'body' => array(
-        array(
-          'message' => 'The @field should have the word "Drupal".',
-          'params' => array (
-            '@field' => 'body',
           ),
         ),
       ),
@@ -100,7 +108,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
         array(
-          'message' => 'The width of the image(@height) is bigger then the allowed size(@min-height)',
+          'message' => 'The height of the image(@height) is bigger then the allowed size(@min-height)',
           'params' => array(
             '@width' => 40,
             '@height' => 20,
@@ -113,7 +121,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
         ),
         array(
           'message' => 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions',
-          'params' => array (
+          'params' => array(
             '@file-name' => 'image-test.png',
             '@extension' => 'png',
             '@extensions' => 'pdf',
@@ -121,8 +129,35 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
+      'body' => array(
+        array(
+          'message' => 'The @field should have the word "Drupal".',
+          'params' => array(
+            '@field' => 'body',
+          ),
+        ),
+      ),
+      'integer_single' => array (
+        array (
+          'message' => 'Invalid value for the field @field.',
+          'params' =>
+            array (
+              '@field' => 'integer_single',
+            ),
+        ),
+      ),
     );
-    $this->assertEqual($result, $expected_result, 'The silent mode returned the expected results.');
+
+    $field_names = array(
+      'title',
+      'body',
+      'field_image',
+      'integer_single',
+    );
+
+    foreach ($field_names as $field_name) {
+      $this->assertEqual($result[$field_name], $expected_result[$field_name], format_string('The silent mode returned the expected results for field @field.', array('@field' => $field_name)));
+    }
   }
 
   /**
