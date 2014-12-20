@@ -9,6 +9,7 @@ files[] = includes/ObjectValidateBase.php
 files[] = includes/ObjectValidateInterface.php
 files[] = includes/EntityValidateBase.php
 files[] = includes/EntityValidateInterface.php
+files[] = includes/FieldsInfo.php
 
 ; Exceptions
 files[] = exceptions/EntityValidatorException.php
