@@ -79,3 +79,43 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
   $handler = new $class($plugin);
   return $handler;
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function entity_validator_form_alter(&$form, &$form_state, $form_id) {
+  // Verify we have the entity and the entity type in the form.
+  if (empty($form['#entity']) || empty($form['#entity_type'])) {
+    return;
+  }
+
+  // Checking that we have a handler for the current entity.
+  $wrapper = entity_metadata_wrapper($form['#entity_type'], $form['#entity']);
+  if (!$handler = entity_validator_get_validator_handler($form['#entity_type'], $wrapper->getBundle())) {
+    return;
+  }
+
+  // Add information to the validation handler.
+  $form_state['#validator_handler'] = $handler;
+  $form_state['#wrapper'] = $wrapper;
+  $form['#validate'][] = 'entity_validator_validate_form';
+}
+
+/**
+ * Validate handler for validating an entity before the form will save it to the
+ * DB.
+ */
+function entity_validator_validate_form($form, &$form_state) {
+  /** @var EntityValidateBase $handler */
+  $handler = $form_state['#validator_handler'];
+
+  /** @var EntityMetadataWrapper $wrapper */
+  $wrapper = $form_state['#wrapper'];
+
+  entity_form_submit_build_entity($form['#entity_type'], $form['#entity'], $form, $form_state);
+
+  $wrapper = entity_metadata_wrapper($form['#entity_type'], $form['#entity']);
+  $handler->validate($form['#entity']);
+
+  form_set_error('a', 'a');
+}
