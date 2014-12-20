@@ -1,6 +1,6 @@
 <?php
 
-abstract class ObjectValidateBase implements ObjectValidateInterface {
+abstract class ObjectValidateBase implements ValidateInterface {
 
   /**
    * @var Array

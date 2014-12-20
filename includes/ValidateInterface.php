@@ -1,6 +1,6 @@
 <?php
 
-interface ObjectValidateInterface {
+interface ValidateInterface {
 
   /**
    * Constructor for the Validator handler.

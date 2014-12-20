@@ -8,8 +8,11 @@ class EntityValidatorExampleObjectValidator extends ObjectValidateBase {
   public function publicFieldsInfo() {
     $fields = parent::publicFieldsInfo();
 
-    $fields['title']['validators'][] = array($this, 'validateTitleText');
-    $fields['created']['validators'][] = array($this, 'validateUnixTimeStamp');
+    FieldsInfo::setFieldInfo($fields['title'], $this)
+      ->addCallback('validateTitleText');
+
+    FieldsInfo::setFieldInfo($fields['created'], $this)
+      ->addCallback('validateUnixTimeStamp');
 
     return $fields;
   }
