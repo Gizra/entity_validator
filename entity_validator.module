@@ -85,7 +85,7 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
  */
 function entity_validator_form_alter(&$form, &$form_state, $form_id) {
   // Verify we have the entity and the entity type in the form.
-  if (!(!empty($form['#entity']) && !empty($form['#entity_type']))) {
+  if (empty($form['#entity']) || empty($form['#entity_type'])) {
     return;
   }
 
@@ -105,15 +105,17 @@ function entity_validator_form_alter(&$form, &$form_state, $form_id) {
  * Validate handler for validating an entity before the form will save it to the
  * DB.
  */
-function entity_validator_validate_form($form, $form_state) {
+function entity_validator_validate_form($form, &$form_state) {
   /** @var EntityValidateBase $handler */
   $handler = $form_state['#validator_handler'];
+
+  /** @var EntityMetadataWrapper $wrapper */
   $wrapper = $form_state['#wrapper'];
-  $entity = $wrapper->value();
 
-  foreach (array_keys($handler->getFieldsInfo()) as $field) {
-    $wrapper->{$field} = ($form_state['values'][$field]);
-  }
+  entity_form_submit_build_entity($form['#entity_type'], $form['#entity'], $form, $form_state);
 
-  form_set_error($wrapper->value());
+  $wrapper = entity_metadata_wrapper($form['#entity_type'], $form['#entity']);
+  $handler->validate($form['#entity']);
+
+  form_set_error('a', 'a');
 }
