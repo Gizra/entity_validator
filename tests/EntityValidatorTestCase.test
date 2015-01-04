@@ -35,6 +35,16 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
     field_update_instance($instance);
 
+    // Create a multiple file field.
+    $field = field_info_field('field_image');
+    $field['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+    $field['field_name'] = 'field_image_multiple';
+    field_create_field($field);
+
+    // Attach the instance.
+    $instance['field_name'] = 'field_image_multiple';
+    field_create_instance($instance);
+
     // Add integer field.
     $field = array(
       'field_name' => 'integer_single',
@@ -67,6 +77,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
     $file = $this->createImage();
     $wrapper->field_image->set(array('fid' => $file->fid));
+    $wrapper->field_image_multiple->set(array(array('fid' => $file->fid)));
 
     // We can't use the wrapper to set a wrong value, so do it directly on the
     // node object.
