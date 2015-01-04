@@ -77,7 +77,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
     $file = $this->createImage();
     $wrapper->field_image->set(array('fid' => $file->fid));
-    $wrapper->field_image_multiple->set(array(array('fid' => $file->fid)));
+    $wrapper->field_image_multiple->set(array(array('fid' => $file->fid), array('fid' => $file->fid)));
 
     // We can't use the wrapper to set a wrong value, so do it directly on the
     // node object.
@@ -140,6 +140,50 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
+      'field_image_multiple' => array(
+        array(
+          'message' => 'The width of the image(@width) is bigger then the allowed size(@min-width)',
+          'params' => array(
+            '@width' => NULL,
+            '@height' => NULL,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@min-width' => '21',
+            '@min-height' => '41',
+            '@field' => 'field_image_multiple',
+          ),
+        ),
+        array(
+          'message' => 'The height of the image(@height) is bigger then the allowed size(@min-height)',
+          'params' => array(
+            '@width' => NULL,
+            '@height' => NULL,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@min-width' => '21',
+            '@min-height' => '41',
+            '@field' => 'field_image_multiple',
+          ),
+        ),
+        array(
+          'message' => 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions',
+          'params' => array(
+            '@file-name' => 'image-test.png',
+            '@extension' => 'png',
+            '@extensions' => 'pdf',
+            '@field' => 'field_image_multiple',
+          ),
+        ),
+        array(
+          'message' => 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions',
+          'params' => array(
+            '@file-name' => 'image-test.png',
+            '@extension' => 'png',
+            '@extensions' => 'pdf',
+            '@field' => 'field_image_multiple',
+          ),
+        ),
+      ),
       'body' => array(
         array(
           'message' => 'The @field should have the word "Drupal".',
@@ -148,13 +192,12 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
       ),
-      'integer_single' => array (
-        array (
+      'integer_single' => array(
+        array(
           'message' => 'Invalid value for the field @field.',
-          'params' =>
-            array (
-              '@field' => 'integer_single',
-            ),
+          'params' => array(
+            '@field' => 'integer_single',
+          ),
         ),
       ),
     );
@@ -163,6 +206,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       'title',
       'body',
       'field_image',
+      'field_image_multiple',
       'integer_single',
     );
 
@@ -193,7 +237,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
 
     // Verify we got right errors.
     $results = $validator->getErrors(FALSE);
-    $expected_results = array (
+    $expected_results = array(
       'title' => array(
         array(
           'message' => 'The @property property should be at least 3 characters long.',

@@ -291,6 +291,8 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
+    // todo: fix.
+
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
@@ -359,9 +361,23 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
+    $field = field_info_field($field_name);
+
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
+    if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+
+      foreach ($value as $file) {
+        $this->fileExtensionValidate($field_name, $file, $settings);
+      }
+    }
+    else {
+      $this->fileExtensionValidate($field_name, $value, $settings);
+    }
+  }
+
+  private function fileExtensionValidate($field_name, $value, $settings) {
     $file = file_load($value['fid']);
 
     $extensions = explode('.', $file->filename);
