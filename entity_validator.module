@@ -61,15 +61,35 @@ function entity_validator_get_validator_plugin($plugin_name) {
  * Return the validation handler based on entity type and bundle.
  *
  * @param $entity_type
- *  The entity type.
+ *   The entity type.
  * @param $bundle
- *  The bundle name.
+ *   The bundle name.
  *
  * @return EntityValidateInterface | NULL
  *  The handler object if found, or NULL.
  */
 function entity_validator_get_validator_handler($entity_type, $bundle) {
   $plugin_name = $entity_type . '__' . $bundle;
+  $plugin = entity_validator_get_validator_plugin($plugin_name);
+
+  if (!$class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class')) {
+    return NULL;
+  }
+
+  $handler = new $class($plugin);
+  return $handler;
+}
+
+/**
+ * Return the validation handler for schema validator.
+ *
+ * @param $plugin_name
+ *   The name of the validator.
+ *
+ * @return ObjectValidateInterface | NULL
+ *   The validator object.
+ */
+function entity_validator_get_schema_validator($plugin_name) {
   $plugin = entity_validator_get_validator_plugin($plugin_name);
 
   if (!$class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class')) {

@@ -83,11 +83,11 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     }
 
     // Silent mode.
-    $result = $handler->validate($node, TRUE);
-    $this->assertFalse($result, 'Validate in silent mode did not throw an exception.');
+    $results = $handler->validate($node, TRUE);
+    $this->assertFalse($results, 'Validate in silent mode did not throw an exception.');
 
-    $result = $handler->getErrors(FALSE);
-    $expected_result = array(
+    $results = $handler->getErrors(FALSE);
+    $expected_results = array(
       'title' => array(
         array(
           'message' => 'The @field should be at least 3 characters long.',
@@ -156,7 +156,58 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     );
 
     foreach ($field_names as $field_name) {
-      $this->assertEqual($result[$field_name], $expected_result[$field_name], format_string('The silent mode returned the expected results for field @field.', array('@field' => $field_name)));
+      $this->assertEqual($results[$field_name], $expected_results[$field_name], format_string('The silent mode returned the expected results for field @field.', array('@field' => $field_name)));
+    }
+
+    // Validating a custom schema.
+    $validator = entity_validator_get_schema_validator('entity_validator_example');
+
+    $object = new stdClass();
+    $object->id = 1;
+    $object->title = 'a';
+    $object->created = 120;
+
+    try {
+      $validator->validate($object);
+    }
+    catch (\EntityValidatorException $e) {
+      $this->pass('Exception "\EntityValidatorException" was thrown.');
+    }
+    catch (\Exception $e) {
+      $this->fail('Exception was not of type "\EntityValidatorException".');
+    }
+
+    $result = $validator->validate($object, TRUE);
+    $this->assertFalse($result, 'Validate a custom schema in a silent mode did not throw an exception.');
+
+    // Verify we got right errors.
+    $results = $validator->getErrors(FALSE);
+    $expected_results = array (
+      'title' => array(
+        array(
+          'message' => 'The @property property should be at least 3 characters long.',
+          'params' => array(
+            '@property' => 'title',
+          ),
+        ),
+      ),
+      'created' => array(
+        array(
+          'message' => 'The @property property should be a valid unix time stamp.',
+          'params' => array(
+            '@property' => 'created',
+          ),
+        ),
+      ),
+    );
+
+    $field_names = array(
+      'title',
+      'created',
+    );
+
+    foreach ($field_names as $field_name) {
+      $this->assertEqual($results[$field_name], $expected_results[$field_name], format_string('The silent mode returned the expected results for field @field.', array('@field' => $field_name)));
     }
   }
 

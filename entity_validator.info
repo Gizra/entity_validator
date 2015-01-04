@@ -1,11 +1,12 @@
 name = Entity validator
-description = "Programmatically validate entities."
+description = "Validating entities or objects."
 core = 7.x
 dependencies[] = ctools
 dependencies[] = entity
 
-
 ; Handlers
+files[] = includes/ValidateInterface.php
+files[] = includes/ObjectValidateBase.php
 files[] = includes/EntityValidateBase.php
 files[] = includes/EntityValidateInterface.php
 files[] = includes/FieldsInfo.php
