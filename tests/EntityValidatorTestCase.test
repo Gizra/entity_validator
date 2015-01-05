@@ -142,10 +142,20 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       ),
       'field_image_multiple' => array(
         array(
-          'message' => 'The width of the image(@width) is bigger then the allowed size(@min-width)',
+          'message' => 'The width of the image(@width) is bigger then the allowed size(@max-width)',
           'params' => array(
-            '@width' => NULL,
-            '@height' => NULL,
+            '@width' => 40,
+            '@height' => 20,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@field' => 'field_image_multiple',
+          ),
+        ),
+        array(
+          'message' => 'The height of the image(@height) is bigger then the allowed size(@min-height)',
+          'params' => array(
+            '@width' => 40,
+            '@height' => 20,
             '@max-width' => '19',
             '@max-height' => '39',
             '@min-width' => '21',
@@ -154,10 +164,20 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
           ),
         ),
         array(
+          'message' => 'The width of the image(@width) is bigger then the allowed size(@max-width)',
+          'params' => array(
+            '@width' => 40,
+            '@height' => 20,
+            '@max-width' => '19',
+            '@max-height' => '39',
+            '@field' => 'field_image_multiple',
+          ),
+        ),
+        array(
           'message' => 'The height of the image(@height) is bigger then the allowed size(@min-height)',
           'params' => array(
-            '@width' => NULL,
-            '@height' => NULL,
+            '@width' => 40,
+            '@height' => 20,
             '@max-width' => '19',
             '@max-height' => '39',
             '@min-width' => '21',

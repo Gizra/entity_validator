@@ -291,11 +291,22 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
-    // todo: fix.
+    $field = field_info_field($field_name);
 
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
+    if ($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+      foreach ($value as $file) {
+        $this->imageSizeValidate($field_name, $settings, $file);
+      }
+    }
+    else {
+      $this->imageSizeValidate($field_name, $settings, $value);
+    }
+  }
+
+  private function imageSizeValidate($field_name, $settings, $value) {
     $file = file_load($value['fid']);
     $url = file_create_url($file->uri);
     $size = getimagesize($url);
@@ -366,8 +377,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
-    if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
-
+    if ($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
       foreach ($value as $file) {
         $this->fileExtensionValidate($field_name, $file, $settings);
       }
