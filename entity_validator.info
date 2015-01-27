@@ -4,16 +4,3 @@ core = 7.x
 
 dependencies[] = plug
 dependencies[] = entity
-
-; Handlers
-files[] = includes/ValidateInterface.php
-files[] = includes/ObjectValidateBase.php
-files[] = includes/EntityValidateBase.php
-files[] = includes/EntityValidateInterface.php
-files[] = includes/FieldsInfo.php
-
-; Exceptions
-files[] = exceptions/EntityValidatorException.php
-
-; Tests
-files[] = tests/EntityValidatorTestCase.test

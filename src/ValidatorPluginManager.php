@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Contains \Drupal\plug_example\ValidatorPluginManager.
