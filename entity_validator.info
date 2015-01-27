@@ -1,7 +1,8 @@
 name = Entity validator
 description = "Validating entities or objects."
 core = 7.x
-dependencies[] = ctools
+
+dependencies[] = plug
 dependencies[] = entity
 
 ; Handlers
