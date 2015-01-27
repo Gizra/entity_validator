@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ *
+ * Holds base validate interface.
+ */
+
+namespace Drupal\entity_validator\Interfaces;
+
 interface ValidateInterface {
 
   /**

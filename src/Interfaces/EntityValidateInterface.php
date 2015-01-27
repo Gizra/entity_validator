@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ *
+ * Holds entity validate base interface.
+ */
+
+namespace Drupal\entity_validator\Interfaces;
+
 interface EntityValidateInterface extends ValidateInterface {
 
   /**

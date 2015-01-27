@@ -2,7 +2,10 @@
 
 /**
  * @file
+ *
  * Contains EntityValidatorException.
  */
 
-class EntityValidatorException extends Exception {}
+namespace Drupal\entity_validator\Exception;
+
+class EntityValidatorException extends \Exception {}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\plug_example\NamePluginManager.
+ * Contains \Drupal\plug_example\ValidatorPluginManager.
  */
 
 namespace Drupal\entity_validator;
@@ -11,12 +11,12 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\plug\Util\Module;
 
 /**
- * Name plugin manager.
+ * Entity validator plugin manager.
  */
 class ValidatorPluginManager extends DefaultPluginManager {
 
   /**
-   * Constructs NamePluginManager.
+   * Constructs ValidatorPluginManager.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
@@ -25,7 +25,7 @@ class ValidatorPluginManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    */
   public function __construct(\Traversable $namespaces, \DrupalCacheInterface $cache_backend) {
-    parent::__construct('Plugin/name', $namespaces, 'Drupal\plug_example\Plugin\name\NameInterface', '\Drupal\plug_example\Annotation\Name');
+    parent::__construct('Plugin/validator', $namespaces, 'Drupal\entity_validator\Interfaces');
     $this->setCacheBackend($cache_backend, 'name_plugins');
     $this->alterInfo('name_plugin');
   }
@@ -36,7 +36,7 @@ class ValidatorPluginManager extends DefaultPluginManager {
    * @param string $bin
    *   The cache bin for the plugin manager.
    *
-   * @return NamePluginManager
+   * @return ValidatorPluginManager
    *   The created manager.
    */
   public static function create($bin = 'cache') {

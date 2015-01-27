@@ -1,6 +1,16 @@
 <?php
 
 /**
+ * @file
+ *
+ * Base fields info definition.
+ */
+
+namespace Drupal\entity_validator;
+
+use Drupal\entity_validator\Interfaces\ValidateInterface;
+
+/**
  * The class designed to set public fields more easily. similar to Drupal 8
  * BaseFieldDefinition.
  *
@@ -16,7 +26,7 @@
 class FieldsInfo {
 
   /**
-   * @var \ValidateInterface
+   * @var ValidateInterface
    *
    * Validate handler for fields.
    */
@@ -36,7 +46,7 @@ class FieldsInfo {
    *   Optional. The validator object.
    * @return FieldsInfo
    */
-  static public function setFieldInfo(&$public_field = array(), \ValidateInterface $validator = NULL) {
+  static public function setFieldInfo(&$public_field = array(), ValidateInterface $validator = NULL) {
     return new static($public_field, $validator);
   }
 
@@ -48,7 +58,7 @@ class FieldsInfo {
    * @param ValidateInterface $validator
    *   Optional. The validator object.
    */
-  public function __construct(&$public_field = array(), \ValidateInterface $validator = NULL) {
+  public function __construct(&$public_field = array(), ValidateInterface $validator = NULL) {
     $this->definition =& $public_field;
 
     if ($validator) {
@@ -59,12 +69,12 @@ class FieldsInfo {
   /**
    * Setter callback of the validator property.
    *
-   * @param \ValidateInterface $validator
+   * @param ValidateInterface $validator
    *   The validator instance.
    *
    * @return $this
    */
-  public function setValidator(\ValidateInterface $validator) {
+  public function setValidator(ValidateInterface $validator) {
     $this->validator = $validator;
     return $this;
   }
@@ -113,13 +123,13 @@ class FieldsInfo {
    *
    * @param $callback
    *   name of the method.
-   * @param \ValidateInterface $object
+   * @param ValidateInterface $object
    *   The validator instance. Optional. When empty the validator property will
    *   be used.
    *
    * @return $this
    */
-  public function addCallback($callback, \ValidateInterface $object = NULL) {
+  public function addCallback($callback, ValidateInterface $object = NULL) {
     if (!$object) {
       $object = $this->validator;
     }

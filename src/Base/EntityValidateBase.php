@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * @file
+ *
+ * Holds the entity validator base class.
+ */
+
+namespace Drupal\entity_validator\Base;
+use Drupal\entity_validator\Interfaces\EntityValidateInterface;
+
+/**
  * Abstract entity validation.
  */
 abstract class EntityValidateBase implements EntityValidateInterface {

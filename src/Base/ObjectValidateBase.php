@@ -1,21 +1,34 @@
 <?php
 
+/**
+ * @file
+ *
+ * Holds the base validator.
+ */
+
+namespace Drupal\entity_validator\Base;
+
+use Drupal\entity_validator\Interfaces\ValidateInterface;
+
 abstract class ObjectValidateBase implements ValidateInterface {
 
   /**
    * @var Array
+   *
    * The schema information.
    */
   protected $schema;
 
   /**
    * @var Array
+   *
    * The plugin information.
    */
   protected $plugin;
 
   /**
    * @var Array
+   *
    * List of errors collected in the validation process.
    */
   protected $errors;

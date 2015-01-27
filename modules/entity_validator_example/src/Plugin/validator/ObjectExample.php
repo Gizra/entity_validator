@@ -1,6 +1,20 @@
 <?php
 
-class EntityValidatorExampleObjectValidator extends ObjectValidateBase {
+namespace Drupal\entity_validator_example\Plugin\validator;
+
+use Drupal\entity_validator\Base\ObjectValidateBase;
+use Drupal\entity_validator\FieldsInfo;
+
+/**
+ * @package Drupal\entity_validator_example\Plugin\validator
+ *
+ * @Validator(
+ *  label = "Entity Validator Example",
+ *  description = "Validate entity validator example objects",
+ *  schema = "entity_validator_example"
+ * )
+ */
+class ObjectExample extends ObjectValidateBase {
 
   /**
    * Overrides ObjectValidateBase::publicFieldsInfo().
