@@ -53,7 +53,7 @@ class ValidatorPluginManager extends DefaultPluginManager {
    * @return \Drupal\entity_validator\Base\EntityValidateBase|NULL
    *   The handler object if found, or NULL.
    */
-  function EntityValidator($entity_type, $bundle) {
+  public static function EntityValidator($entity_type, $bundle) {
   }
 
   /**
@@ -65,7 +65,7 @@ class ValidatorPluginManager extends DefaultPluginManager {
    * @return \Drupal\entity_validator\Base\ObjectValidateBase|NULL
    *   The validator object.
    */
-  function SchemaValidator($schema) {
+  public static function SchemaValidator($schema) {
   }
 
 
