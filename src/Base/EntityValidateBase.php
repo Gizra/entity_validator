@@ -6,12 +6,13 @@
  */
 
 namespace Drupal\entity_validator\Base;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\entity_validator\Interfaces\EntityValidateInterface;
 
 /**
  * Abstract entity validation.
  */
-abstract class EntityValidateBase implements EntityValidateInterface {
+abstract class EntityValidateBase extends PluginBase implements EntityValidateInterface {
 
   /**
    * The entity type.
@@ -49,15 +50,11 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   protected $errors = array();
 
   /**
-   * Constructs a EntityValidateBase object.
-   *
-   * @param array $plugin
-   *   Plugin definition.
+   * {@inheritdoc}
    */
-  public function __construct($plugin) {
-    $this->plugin = $plugin;
-    $this->entityType = $plugin['entity_type'];
-    $this->bundle = $plugin['bundle'];
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    $this->entityType = $plugin_definition['entity_type'];
+    $this->bundle = $plugin_definition['bundle'];
   }
 
   /**

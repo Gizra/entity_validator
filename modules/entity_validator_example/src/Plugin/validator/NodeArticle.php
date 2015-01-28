@@ -9,13 +9,14 @@ use Drupal\entity_validator\FieldsInfo;
  * @package Drupal\entity_validator_example\Plugin\validator
  *
  * @Validator(
+ *  id = "node_article",
  *  label = "Article",
  *  description = "Validate the article content type.",
  *  entity_type = "node",
  *  bundle = "article"
  * )
  */
-class Article extends EntityValidateBase {
+class NodeArticle extends EntityValidateBase {
 
   /**
    * Overrides EntityValidateBase::publicFieldsInfo().

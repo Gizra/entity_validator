@@ -24,9 +24,9 @@ class ValidatorPluginManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    */
   public function __construct(\Traversable $namespaces, \DrupalCacheInterface $cache_backend) {
-    parent::__construct('Plugin/validator', $namespaces, 'Drupal\entity_validator\Interfaces');
-    $this->setCacheBackend($cache_backend, 'name_plugins');
-    $this->alterInfo('name_plugin');
+    parent::__construct('Plugin/validator', $namespaces, 'Drupal\entity_validator\Interfaces\ValidateInterface', '\Drupal\entity_validator\Annotation\Validator');
+    $this->setCacheBackend($cache_backend, 'validator_plugins');
+    $this->alterInfo('validator_plugin');
   }
 
   /**
@@ -41,5 +41,32 @@ class ValidatorPluginManager extends DefaultPluginManager {
   public static function create($bin = 'cache') {
     return new static(Module::getNamespaces(), _cache_get_object($bin));
   }
+
+  /**
+   * Return the validation handler based on entity type and bundle.
+   *
+   * @param $entity_type
+   *   The entity type.
+   * @param $bundle
+   *   The bundle name.
+   *
+   * @return \Drupal\entity_validator\Base\EntityValidateBase|NULL
+   *   The handler object if found, or NULL.
+   */
+  function EntityValidator($entity_type, $bundle) {
+  }
+
+  /**
+   * Return the validation handler for schema validator.
+   *
+   * @param $schema
+   *   The name of the validator.
+   *
+   * @return \Drupal\entity_validator\Base\ObjectValidateBase|NULL
+   *   The validator object.
+   */
+  function SchemaValidator($schema) {
+  }
+
 
 }

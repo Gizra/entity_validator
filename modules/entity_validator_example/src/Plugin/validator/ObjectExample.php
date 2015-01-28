@@ -9,9 +9,10 @@ use Drupal\entity_validator\FieldsInfo;
  * @package Drupal\entity_validator_example\Plugin\validator
  *
  * @Validator(
+ *  id = "entity_validator_example",
  *  label = "Entity Validator Example",
  *  description = "Validate entity validator example objects",
- *  schema = "entity_validator_example"
+ *  entity = false
  * )
  */
 class ObjectExample extends ObjectValidateBase {
