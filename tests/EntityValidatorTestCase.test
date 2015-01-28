@@ -1,12 +1,12 @@
 <?php
-use Drupal\entity_validator\ValidatorPluginManager;
+
 
 /**
  * @file
  * Contains EntityValidatorTestCase.
  */
 
-class EntityValidatorTestCase extends DrupalWebTestCase {
+class EntityValidatorTestCase extends \DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -63,7 +63,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     );
     $node = entity_create('node', $values);
 
-    $handler = ValidatorPluginManager::EntityValidator('node', 'article');
+    $handler = Drupal\entity_validator\ValidatorPluginManager::EntityValidator('node', 'article');
     $wrapper = entity_metadata_wrapper('node', $node);
 
     $file = $this->createImage();
@@ -76,11 +76,11 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     try {
       $handler->validate($node);
     }
-    catch (\EntityValidatorException $e) {
-      $this->pass('Exception "\EntityValidatorException" was thrown.');
+    catch (Drupal\entity_validator\Exception\EntityValidatorException $e) {
+      $this->pass('Exception "EntityValidatorException" was thrown.');
     }
     catch (\Exception $e) {
-      $this->fail('Exception was not of type "\EntityValidatorException".');
+      $this->fail('Exception was not of type "EntityValidatorException".');
     }
 
     // Silent mode.
@@ -171,11 +171,11 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     try {
       $validator->validate($object);
     }
-    catch (\EntityValidatorException $e) {
-      $this->pass('Exception "\EntityValidatorException" was thrown.');
+    catch (Drupal\entity_validator\Exception\EntityValidatorException $e) {
+      $this->pass('Exception "EntityValidatorException" was thrown.');
     }
     catch (\Exception $e) {
-      $this->fail('Exception was not of type "\EntityValidatorException".');
+      $this->fail('Exception was not of type "EntityValidatorException".');
     }
 
     $result = $validator->validate($object, TRUE);
