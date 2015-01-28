@@ -7,6 +7,7 @@
 
 namespace Drupal\entity_validator\Base;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\entity_validator\FieldsInfo;
 use Drupal\entity_validator\Interfaces\EntityValidateInterface;
 
 /**

@@ -54,6 +54,8 @@ class ValidatorPluginManager extends DefaultPluginManager {
    *   The handler object if found, or NULL.
    */
   public static function EntityValidator($entity_type, $bundle) {
+    $plugin = static::create();
+    return $plugin->createInstance($entity_type . '_' . $bundle);
   }
 
   /**
@@ -66,7 +68,8 @@ class ValidatorPluginManager extends DefaultPluginManager {
    *   The validator object.
    */
   public static function SchemaValidator($schema) {
+    $plugin = static::create();
+    return $plugin->createInstance($schema);
   }
-
 
 }
