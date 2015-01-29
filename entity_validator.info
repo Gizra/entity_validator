@@ -4,3 +4,5 @@ core = 7.x
 
 dependencies[] = plug
 dependencies[] = entity
+
+files[] = tests/EntityValidatorTestCase.test

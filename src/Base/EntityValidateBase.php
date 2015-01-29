@@ -7,6 +7,7 @@
 
 namespace Drupal\entity_validator\Base;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\entity_validator\Exception\EntityValidatorException;
 use Drupal\entity_validator\FieldsInfo;
 use Drupal\entity_validator\Interfaces\EntityValidateInterface;
 
@@ -195,7 +196,7 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
     }
 
     $params = array('@errors' => $errors);
-    throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
+    throw new EntityValidatorException(format_string('The validation process failed: @errors', $params));
   }
 
   /**
@@ -239,12 +240,12 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
    *   The field name.
    * @param mixed $value
    *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
+   * @param \EntityMetadataWrapper $wrapper
    *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
+   * @param \EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  protected function isNotEmpty($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  protected function isNotEmpty($field_name, $value, \EntityMetadataWrapper $wrapper, \EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       $params = array('@field' => $field_name);
       $this->setError($field_name, 'The field @field cannot be empty.', $params);
@@ -258,12 +259,12 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
    *   The field name.
    * @param mixed $value
    *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
+   * @param \EntityMetadataWrapper $wrapper
    *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
+   * @param \EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  protected function isValidValue($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  protected function isValidValue($field_name, $value, \EntityMetadataWrapper $wrapper, \EntityMetadataWrapper $property_wrapper) {
     // Loading default value of the fields and the instance.
     if (!$field_info = field_info_field($field_name)) {
       // Not a field.
@@ -287,12 +288,12 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
    *   The field name.
    * @param mixed $value
    *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
+   * @param \EntityMetadataWrapper $wrapper
    *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
+   * @param \EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  protected function validateImageSize($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  protected function validateImageSize($field_name, $value, \EntityMetadataWrapper $wrapper, \EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       return;
     }
@@ -355,12 +356,12 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
    *   The field name.
    * @param mixed $value
    *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
+   * @param \EntityMetadataWrapper $wrapper
    *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
+   * @param \EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  protected function validateFileExtension($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  protected function validateFileExtension($field_name, $value, \EntityMetadataWrapper $wrapper, \EntityMetadataWrapper $property_wrapper) {
     if (empty($value)) {
       return;
     }
