@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\entity_validator\ValidatorPluginManager;
+use Drupal\entity_validator\Exception\EntityValidatorException;
 
 /**
  * @file
@@ -76,8 +78,8 @@ class EntityValidatorTestCase extends \DrupalWebTestCase {
     try {
       $handler->validate($node);
     }
-    catch (Drupal\entity_validator\Exception\EntityValidatorException $e) {
-      $this->pass('Exception "EntityValidatorException" was thrown.');
+    catch (EntityValidatorException $e) {
+      $this->pass('Exception "\EntityValidatorException" was thrown.');
     }
     catch (\Exception $e) {
       $this->fail('Exception was not of type "EntityValidatorException".');
@@ -161,7 +163,7 @@ class EntityValidatorTestCase extends \DrupalWebTestCase {
     }
 
     // Validating a custom schema.
-    $validator = entity_validator_get_schema_validator('entity_validator_example');
+    $validator = ValidatorPluginManager::SchemaValidator('entity_validator_example');
 
     $object = new stdClass();
     $object->id = 1;
@@ -171,8 +173,8 @@ class EntityValidatorTestCase extends \DrupalWebTestCase {
     try {
       $validator->validate($object);
     }
-    catch (Drupal\entity_validator\Exception\EntityValidatorException $e) {
-      $this->pass('Exception "EntityValidatorException" was thrown.');
+    catch (EntityValidatorException $e) {
+      $this->pass('Exception "\EntityValidatorException" was thrown.');
     }
     catch (\Exception $e) {
       $this->fail('Exception was not of type "EntityValidatorException".');
