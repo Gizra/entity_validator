@@ -30,15 +30,15 @@ before_script:
   - cd entity_validator/drupal
 
   # Download and enable modules
-  - drush --yes dl xautoload --dev
-  - drush --yes dl composer-8.x-1.x
-  - drush --yes dl composer_manager
-  - drush --yes dl plug --dev
+#  - drush --yes dl xautoload --dev
+#  - drush --yes dl composer-8.x-1.x
+#  - drush --yes dl composer_manager
+#  - drush --yes dl plug --dev
 
   # Add the required patch in https://www.drupal.org/node/2403317
-  - cd sites/all/modules/composer_manager
-  - wget https://www.drupal.org/files/issues/composer_manager_autoloader.patch
-  - patch -p1 < composer_manager_autoloader.patch
+#  - cd sites/all/modules/composer_manager
+#  - wget https://www.drupal.org/files/issues/composer_manager_autoloader.patch
+#  - patch -p1 < composer_manager_autoloader.patch
   - drush --yes pm-enable entity_validator
 
   # start a web server on port 8080, run in the background; wait for initialization
