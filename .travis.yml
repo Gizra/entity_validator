@@ -28,6 +28,8 @@ before_script:
   # reference and enable entity_validator in build site
   - ln -s $(readlink -e $(cd -)) entity_validator/drupal/sites/all/modules/entity_validator
   - cd entity_validator/drupal
+  - pwd
+  - ls -al
   - drush --yes pm-enable entity_validator
 
   # start a web server on port 8080, run in the background; wait for initialization
