@@ -30,10 +30,10 @@ before_script:
   - cd entity_validator/drupal
 
   # Download and enable modules
-  - drush --yes dl xautoload --dev
+  - drush --yes dl xautoload
   - drush --yes dl composer-8.x-1.x
   - drush --yes dl composer_manager
-  - drush --yes dl plug --dev
+  - drush --yes dl plug
 
   # Add the required patch in https://www.drupal.org/node/2403317
   - cd sites/all/modules/composer_manager
