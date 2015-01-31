@@ -39,7 +39,7 @@ before_script:
   - cd sites/all/modules/composer_manager
   - wget https://www.drupal.org/files/issues/composer_manager_autoloader.patch
   - patch -p1 < composer_manager_autoloader.patch
-  - drush pm-enable entity_validator
+  - drush --yes pm-enable entity_validator
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 &
