@@ -1,11 +1,22 @@
 <?php
 
-/**
- * @file
- * Contains EntityValidatorExampleArticleValidator.
- */
+namespace Drupal\entity_validator_example\Plugin\validator;
 
-class EntityValidatorExampleArticleValidator extends EntityValidateBase {
+use Drupal\entity_validator\Base\EntityValidateBase;
+use Drupal\entity_validator\FieldsInfo;
+
+/**
+ * @package Drupal\entity_validator_example\Plugin\validator
+ *
+ * @Validator(
+ *  id = "node_article",
+ *  label = "Article",
+ *  description = "Validate the article content type.",
+ *  entity_type = "node",
+ *  bundle = "article"
+ * )
+ */
+class NodeArticle extends EntityValidateBase {
 
   /**
    * Overrides EntityValidateBase::publicFieldsInfo().
@@ -30,12 +41,12 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    *   The field name.
    * @param mixed $value
    *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
+   * @param \EntityMetadataWrapper $wrapper
    *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
+   * @param \EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  public function validateTitleText($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  public function validateTitleText($field_name, $value, \EntityMetadataWrapper $wrapper, \EntityMetadataWrapper $property_wrapper) {
     if (strlen($value) < 3) {
       $this->setError($field_name, 'The @field should be at least 3 characters long.');
     }
@@ -48,12 +59,12 @@ class EntityValidatorExampleArticleValidator extends EntityValidateBase {
    *   The field name.
    * @param mixed $value
    *   The value of the field.
-   * @param EntityMetadataWrapper $wrapper
+   * @param \EntityMetadataWrapper $wrapper
    *   The wrapped entity.
-   * @param EntityMetadataWrapper $property_wrapper
+   * @param \EntityMetadataWrapper $property_wrapper
    *   The wrapped property.
    */
-  public function validateBodyText($field_name, $value, EntityMetadataWrapper $wrapper, EntityMetadataWrapper $property_wrapper) {
+  public function validateBodyText($field_name, $value, \EntityMetadataWrapper $wrapper, \EntityMetadataWrapper $property_wrapper) {
     if (strpos($value, 'Drupal') === FALSE) {
       $this->setError($field_name, 'The @field should have the word "Drupal".');
     }

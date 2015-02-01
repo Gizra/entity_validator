@@ -1,11 +1,14 @@
 <?php
 
+use Drupal\entity_validator\ValidatorPluginManager;
+use Drupal\entity_validator\Exception\EntityValidatorException;
+
 /**
  * @file
  * Contains EntityValidatorTestCase.
  */
 
-class EntityValidatorTestCase extends DrupalWebTestCase {
+class EntityValidatorTestCase extends \DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -61,9 +64,9 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
       'type' => 'article',
     );
     $node = entity_create('node', $values);
-    $handler = entity_validator_get_validator_handler('node', 'article');
-    $wrapper = entity_metadata_wrapper('node', $node);
 
+    $handler = Drupal\entity_validator\ValidatorPluginManager::EntityValidator('node', 'article');
+    $wrapper = entity_metadata_wrapper('node', $node);
 
     $file = $this->createImage();
     $wrapper->field_image->set(array('fid' => $file->fid));
@@ -75,11 +78,11 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     try {
       $handler->validate($node);
     }
-    catch (\EntityValidatorException $e) {
+    catch (EntityValidatorException $e) {
       $this->pass('Exception "\EntityValidatorException" was thrown.');
     }
     catch (\Exception $e) {
-      $this->fail('Exception was not of type "\EntityValidatorException".');
+      $this->fail('Exception was not of type "EntityValidatorException".');
     }
 
     // Silent mode.
@@ -160,7 +163,7 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     }
 
     // Validating a custom schema.
-    $validator = entity_validator_get_schema_validator('entity_validator_example');
+    $validator = ValidatorPluginManager::SchemaValidator('entity_validator_example');
 
     $object = new stdClass();
     $object->id = 1;
@@ -170,11 +173,11 @@ class EntityValidatorTestCase extends DrupalWebTestCase {
     try {
       $validator->validate($object);
     }
-    catch (\EntityValidatorException $e) {
+    catch (EntityValidatorException $e) {
       $this->pass('Exception "\EntityValidatorException" was thrown.');
     }
     catch (\Exception $e) {
-      $this->fail('Exception was not of type "\EntityValidatorException".');
+      $this->fail('Exception was not of type "EntityValidatorException".');
     }
 
     $result = $validator->validate($object, TRUE);
