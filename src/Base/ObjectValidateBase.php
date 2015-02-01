@@ -1,21 +1,34 @@
 <?php
+/**
+ * @file
+ *
+ * Holds the base validator.
+ */
+
+namespace Drupal\entity_validator\Base;
+
+use Drupal\entity_validator\Exception\EntityValidatorException;
+use Drupal\entity_validator\Interfaces\ValidateInterface;
 
 abstract class ObjectValidateBase implements ValidateInterface {
 
   /**
    * @var Array
+   *
    * The schema information.
    */
   protected $schema;
 
   /**
    * @var Array
+   *
    * The plugin information.
    */
   protected $plugin;
 
   /**
    * @var Array
+   *
    * List of errors collected in the validation process.
    */
   protected $errors;
@@ -56,16 +69,16 @@ abstract class ObjectValidateBase implements ValidateInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin) {
-    $this->setPlugin($plugin);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    $this->plugin = $plugin_definition;
 
-    if (empty($this->plugin['schema'])) {
-      throw new \EntityValidatorException('Missing schema name.');
+    if ($this->plugin['entity']) {
+      throw new EntityValidatorException(t("Object validation can't handle entity"));
     }
 
-    $schema = drupal_get_schema($plugin['schema'], TRUE);
-    if (!$schema || !db_table_exists($plugin['schema'])) {
-      throw new \EntityValidatorException(format_string('A schema or a definition for @name was not found.', array('@name' => $plugin['schema'])));
+    $schema = drupal_get_schema($this->plugin['id'], TRUE);
+    if (!$schema || !db_table_exists($this->plugin['id'])) {
+      throw new EntityValidatorException(format_string('A schema or a definition for @name was not found.', array('@name' => $plugin['schema'])));
     }
 
     $this->setSchema($schema);
@@ -167,7 +180,7 @@ abstract class ObjectValidateBase implements ValidateInterface {
     }
 
     $params = array('@errors' => $errors);
-    throw new \EntityValidatorException(format_string('The validation process failed: @errors', $params));
+    throw new EntityValidatorException(format_string('The validation process failed: @errors', $params));
   }
 
   /**

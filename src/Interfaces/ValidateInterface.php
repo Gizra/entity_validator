@@ -1,14 +1,20 @@
 <?php
+/**
+ * @file
+ *
+ * Holds base validate interface.
+ */
+
+namespace Drupal\entity_validator\Interfaces;
+
+use Drupal\entity_validator\Exception\EntityValidatorException;
 
 interface ValidateInterface {
 
   /**
-   * Constructor for the Validator handler.
-   *
-   * @param $plugin
-   *   The validator plugin object.
+   * {@inheritdoc}
    */
-  public function __construct($plugin);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition);
 
   /**
    * Return array with the field validate methods.
@@ -47,7 +53,7 @@ interface ValidateInterface {
    * @param $params
    *   Optional. The parameters for the t() function.
    *
-   * @throws Exception
+   * @throws \Exception
    *   When setting the error level to 1 exception will be thrown with the value
    *   of the error.
    *
