@@ -291,9 +291,32 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
+    $field = field_info_field($field_name);
+
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
+    if ($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+      foreach ($value as $file) {
+        $this->imageSizeValidate($field_name, $file, $settings);
+      }
+    }
+    else {
+      $this->imageSizeValidate($field_name, $value, $settings);
+    }
+  }
+
+  /**
+   * Helper function; Validating the image size.
+   *
+   * @param $field_name
+   *   The field name.
+   * @param $value
+   *   The field value.
+   * @param $settings
+   *   The field settings.
+   */
+  private function imageSizeValidate($field_name, $value, $settings) {
     $file = file_load($value['fid']);
     $url = file_create_url($file->uri);
     $size = getimagesize($url);
@@ -359,9 +382,32 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
+    $field = field_info_field($field_name);
+
     $info = field_info_instance($this->getEntityType(), $field_name, $this->getBundle());
     $settings = $info['settings'];
 
+    if ($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
+      foreach ($value as $file) {
+        $this->fileExtensionValidate($field_name, $file, $settings);
+      }
+    }
+    else {
+      $this->fileExtensionValidate($field_name, $value, $settings);
+    }
+  }
+
+  /**
+   * Helper function; Validating the file extension.
+   *
+   * @param $field_name
+   *   The field name.
+   * @param $value
+   *   The field value.
+   * @param $settings
+   *   The field settings.
+   */
+  private function fileExtensionValidate($field_name, $value, $settings) {
     $file = file_load($value['fid']);
 
     $extensions = explode('.', $file->filename);
