@@ -269,7 +269,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
       return;
     }
 
-    if (!$wrapper->{$field_name}->validate($value)) {
+    if (!$property_wrapper->validate($value)) {
       $this->setError($field_name, 'Invalid value for the field @field.');
     }
   }
