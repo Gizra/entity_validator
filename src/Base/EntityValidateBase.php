@@ -183,19 +183,14 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
     foreach ($public_fields as $public_field) {
       $property = $public_field['property'];
 
+      $value = $this->publicValue($public_field, $entity);
+      $property_wrapper = $this->propertyWrapper($public_field, $entity);
       foreach ($public_field['validators'] as $validator) {
-        $property_wrapper = $wrapper->{$property};
-
-        if (!empty($public_field['sub_property']) && $property_wrapper->value()) {
-          $property_wrapper = $property_wrapper->{$public_field['sub_property']};
+        if (!$validator) {
+          continue;
         }
-
-        $value = $property_wrapper->value();
-
-        if ($validator) {
-          // Property has value.
-          call_user_func($validator, $property, $value, $wrapper, $property_wrapper);
-        }
+        // Property has value.
+        $validator[0]->{$validator[1]}($property, $value, $wrapper, $property_wrapper);
       }
     }
 
@@ -395,6 +390,50 @@ abstract class EntityValidateBase extends PluginBase implements EntityValidateIn
       );
       $this->setError($field_name, 'The file (@file-name) extension (@extension) did not match the allowed extensions: @extensions', $params);
     }
+  }
+
+  /**
+   * Get the value for a public field based on the field definitions.
+   *
+   * @param array $public_field
+   *   The field definition.
+   * @param object $entity
+   *   The entity.
+   *
+   * @return mixed
+   *   The contents of the field.
+   */
+  protected function publicValue($public_field, $entity) {
+    return $this->propertyWrapper($public_field, $entity)->value();
+  }
+
+  /**
+   * Get the property wrapper.
+   *
+   * @param array $public_field
+   *   The field definition.
+   * @param object $entity
+   *   The entity.
+   *
+   * @return \EntityStructureWrapper
+   *   The property wrapper
+   */
+  protected function propertyWrapper($public_field, $entity) {
+    $property = $public_field['property'];
+    $wrapper = entity_metadata_wrapper($this->entityType, $entity);
+    $property_wrapper = $wrapper->{$property};
+
+    if (!empty($public_field['sub_property']) && $property_wrapper->value()) {
+      try {
+        $property_wrapper = $property_wrapper->{$public_field['sub_property']};
+      }
+      catch (\EntityMetadataWrapperException $e) {
+        throw new EntityValidatorException(format_string('Server configuration error, the validator for @property is invalid.', array(
+          '@property' => $public_field['property'],
+        )));
+      }
+    }
+    return $property_wrapper;
   }
 
 }

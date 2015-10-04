@@ -28,7 +28,7 @@ class NodeArticle extends EntityValidateBase {
       ->addCallback('validateTitleText');
 
     FieldsInfo::setFieldInfo($public_fields['body'], $this)
-      ->setSubProperty('body')
+      ->setSubProperty('value')
       ->addCallback('validateBodyText');
 
     return $public_fields;
