@@ -73,7 +73,8 @@ function entity_validator_get_validator_handler($entity_type, $bundle) {
   $plugin = entity_validator_get_validator_plugin($plugin_name);
 
   if (!$class = ctools_plugin_load_class('entity_validator', 'validator', $plugin_name, 'class')) {
-    return NULL;
+    // We did not found any validator handler. Initialize the base handler.
+    return new EntityValidateBase(array(), $entity_type, $bundle);
   }
 
   $handler = new $class($plugin);
