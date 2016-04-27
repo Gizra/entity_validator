@@ -3,7 +3,14 @@
 /**
  * Abstract entity validation.
  */
-abstract class EntityValidateBase implements EntityValidateInterface {
+class EntityValidateBase implements EntityValidateInterface {
+
+  /**
+   * @var array
+   *
+   * Information about the plugin.
+   */
+  protected $plugin;
 
   /**
    * The entity type.
@@ -36,7 +43,7 @@ abstract class EntityValidateBase implements EntityValidateInterface {
   /**
    * Store the errors in case the error set to 0.
    *
-   * @var Array
+   * @var array
    */
   protected $errors = array();
 
